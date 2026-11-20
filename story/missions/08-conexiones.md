@@ -5,10 +5,10 @@ start: CASA-01
 pickup: PRACA-20
 pickup_objective: Buscá el Mapa de Conexiones en PRACA-20
 target: CASA-353
-objective: Llevale el mapa a Chispa en CASA-353
+objective: Llevale el mapa a Chispa en el Escondite de la Colina (CASA-353)
 give_item: mapa-conexiones
 require_item: mapa-conexiones
-delivery_prompt: Chispa quiere el mapa. Elegí el objeto:
+delivery_prompt: Chispa espera el mapa. Elegí el objeto:
 wrong_item_message: Ese no es el mapa de los hilos rojos.
 ---
 
@@ -17,21 +17,27 @@ left: byte
 right: vera
 bg: Guarida de la Familia Ceibo
 
-- Vera: Los datos están separados en tablas. Yo quiero verlos juntos.
-- Byte: Para eso se usan los JOIN: unen filas de varias tablas por la columna que tienen en común.
-- Vera: Chispa armó un mapa con hilos rojos que une todo. Quedó en la PRACA-20.
+- Vera: Los datos están separados en tablas. El alias en una, el nombre de la banda en otra. Yo quiero verlos juntos.
+- Byte: Para eso se usa JOIN: une filas de dos tablas usando la columna que tienen en común.
+- Vera: Chispa armó un mapa con hilos rojos que conecta a todos. Quedó en la PRACA-20.
+- OPCAO: Hilos rojos… muy de película de detectives. -> NEXT
 - OPCAO: Lo busco. -> NEXT
-- OPCAO: ¿Hilos rojos? Muy de película. -> NEXT
-- Vera: Llevalo al escondite de la colina, CASA-353. Chispa te espera.
+- Vera: Llevalo al escondite de la colina, CASA-353. Chispa se mudó ahí. Dice que el taller… tiene corriente de aire.
 
 ## CUTSCENE_FIM
 left: byte
 right: chispa
 bg: Escondite de la Colina
 
-- Chispa: ¡El mapa! Mirá: cada hilo es una clave foránea.
-- Byte: Exacto. Tomá:
+- Chispa: ¡El mapa! Mirá: cada hilo rojo une a un miembro con su banda.
+- Byte: Cada hilo es una clave foránea. Tomá:
 - ENTREGAR: mapa-conexiones
-- Chispa: Quiero ver cada miembro con su banda. Y las misiones de Vera con la plata que dejaron.
+- Chispa: Quiero ver cada alias con el nombre de su banda. Y las misiones de Vera, con la plata que dejó cada una.
+- Byte: La segunda necesita tres tablas: misión, participación… y el filtro por Vera.
+- OPCAO: Junto las tablas sin condición, total la base se arregla. -> GAMEOVER: Sin la condición del JOIN salió el producto cartesiano: cada miembro con cada banda. Vera ahora cree que Rayo es de tres bandas a la vez.
+- OPCAO: Uno las tablas con ON, por la columna en común. -> NEXT
 - SQL: mision-8
 - Chispa: ¡Un JOIN de tres tablas! Ahora sí parece una película.
+- Byte: Hablando de unir cosas, Chispa. Pluma en tu taller. Luz a la noche. Un grito. Un aleteo. Una paloma.
+- Chispa: …
+- Chispa: Te lo cuento en el casino. Delante de la jefa. Es justo.

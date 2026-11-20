@@ -410,7 +410,7 @@ export const PHASES = [
         const prev = st.current;
         engine.run(`USE ${DB_NAME};
           CREATE TABLE chismes (id INT PRIMARY KEY, texto VARCHAR(80));
-          INSERT INTO chismes VALUES (1, 'Chispa le tiene miedo a las palomas'), (2, 'Rayo choca el auto todas las semanas'), (3, 'La jefa guarda el botín en el Casino');`);
+          INSERT INTO chismes VALUES (1, 'Chispa le tiene miedo a las palomas'), (2, 'Rayo choca el auto todos los martes'), (3, 'Anoche entró una paloma al taller de Chispa');`);
         st.current = prev;
         engine.state.current = prev;
       }

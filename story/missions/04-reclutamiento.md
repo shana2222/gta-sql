@@ -17,23 +17,28 @@ left: byte
 right: vera
 bg: Guarida de la Familia Ceibo
 
-- Vera: Las tablas están vacías. Una base sin datos es como un auto sin nafta.
-- Byte: Hay que cargar filas. Eso es DML: insertar, modificar y borrar datos.
-- Vera: Nuestro informante dejó un expediente en la PRACA-25: bandas, miembros y vehículos.
-- Vera: Y otra cosa, Byte… desde hoy sos parte de la familia. Anotate vos también.
+- Vera: La estructura está lista. Pero una base sin datos es un garaje sin autos.
+- Byte: Ahora toca DML: el lenguaje que maneja los datos. Insertar filas, cambiarlas y borrarlas.
+- Vera: Un informante dejó un expediente en la PRACA-25: las bandas de la ciudad, sus miembros y sus autos.
+- Vera: Y otra cosa. Te ganaste un lugar. Desde hoy sos parte de la Familia Ceibo. Anotate vos también.
 - OPCAO: ¡Gracias, jefa! -> NEXT
 - OPCAO: ¿Con cuánto respeto arranco? -> NEXT
-- Vera: Con 10. El respeto se gana. Llevá el expediente al taller de Chispa.
+- Vera: Con 10. El respeto no se inserta: se gana. Llevá el expediente al taller de Chispa.
 
 ## CUTSCENE_FIM
 left: byte
 right: chispa
 bg: Taller de Chispa
 
-- Chispa: ¿Ese es el expediente? ¡Dámelo!
+- Chispa: ¡El expediente! Pasámelo, que lo cargamos ya.
 - Byte: Tomá:
 - ENTREGAR: expediente
-- Chispa: Ojo con el orden: primero las bandas, después los miembros, después los vehículos.
-- Byte: Claro: un miembro no puede apuntar a una banda que todavía no existe.
+- Chispa: Empiezo por los miembros, que son los más divertidos.
+- OPCAO: Dale, cargá primero los miembros. -> GAMEOVER: ERROR 1452. Cada miembro apuntaba a una banda que todavía no existía. La base dijo que no… 47 veces.
+- OPCAO: Primero las bandas: los miembros apuntan a ellas. -> NEXT
+- Chispa: Tenés razón. Primero la tabla "padre", después las "hijas". Si no, la clave foránea se queja.
+- Byte: Y los textos van entre comillas simples. Los números, sin comillas.
 - SQL: mision-4
-- Chispa: ¡Bienvenida oficialmente a la Familia Ceibo, Byte! Ya figurás en la base.
+- Chispa: ¡Bienvenida oficialmente a la familia, Byte! Ya sos una fila de la tabla miembro.
+- Byte: Chispa, una pregunta. ¿Anoche estuviste acá, en el taller?
+- Chispa: ¿Anoche? Eh… estaba… durmiendo. Muy dormido. Andá, que Pepe tiene datos para vos.

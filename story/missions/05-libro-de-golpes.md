@@ -5,10 +5,10 @@ start: COM-320
 pickup: PRACA-29
 pickup_objective: Buscá el Libro de Golpes en PRACA-29
 target: CASA-656
-objective: Llevale el libro a Pepe en CASA-656
+objective: Llevale el libro a Pepe en el Depósito del Puerto (CASA-656)
 give_item: libro-golpes
 require_item: libro-golpes
-delivery_prompt: Pepe quiere ver el libro. Elegí el objeto:
+delivery_prompt: Pepe quiere ver el libro antes de hablar. Elegí el objeto:
 wrong_item_message: No, no, no. Eso no lo compro.
 ---
 
@@ -17,22 +17,25 @@ left: byte
 right: chispa
 bg: Taller de Chispa
 
-- Chispa: Faltan las misiones. Pepe, de los Vagos del Puerto, sabe qué golpes se hicieron.
-- Byte: ¿Pepe es de otra banda?
-- Chispa: Sí, pero vende información. Pide el Libro de Golpes a cambio. Está en la PRACA-29.
-- OPCAO: Lo busco y voy al puerto. -> NEXT
-- OPCAO: ¿Es de confianza? -> NEXT
-- Chispa: Ni un poquito. Pero los datos son buenos. Su depósito está en CASA-656.
+- Chispa: Faltan los golpes: qué misiones hicimos, cuánto pagaron y quién participó.
+- Byte: ¿Quién sabe eso?
+- Chispa: Pepe, de los Vagos del Puerto. No es de la familia, pero vende información.
+- Chispa: Pide el Libro de Golpes a cambio. Lo escondimos en la PRACA-29.
+- OPCAO: ¿Pepe es de confianza? -> NEXT
+- OPCAO: Voy. ¿Algún consejo? -> NEXT
+- Chispa: Contá los dedos después de darle la mano. Su depósito está en CASA-656.
 
 ## CUTSCENE_FIM
 left: byte
 right: pepe
 bg: Depósito del Puerto
 
-- Pepe: Byte, ¿no? Me dijeron que traés algo para mí.
-- Byte: El Libro de Golpes:
+- Pepe: La famosa Byte. Toda la ciudad habla de tu base de datos.
+- Byte: Traje lo que pediste:
 - ENTREGAR: libro-golpes
-- Pepe: Trato justo. Te dicto las misiones y quién participó en cada una, con la fecha.
-- Byte: Las participaciones van en la tabla intermedia. Cada fila une un miembro con una misión.
+- Pepe: Trato justo. Tres misiones, cada una con su recompensa y sus estrellas de policía. Y quién estuvo en cada una, con la fecha.
+- Byte: Las misiones van en su tabla. Y cada participación es una fila en la tabla del medio: un miembro, una misión, una fecha.
+- Pepe: Y antes de que preguntes: yo no quemé la libreta. Los Vagos no quemamos papeles. Los vendemos.
 - SQL: mision-5
-- Pepe: Linda tabla intermedia. Muchos a muchos, como mis negocios.
+- Pepe: Muchos a muchos. Como mis negocios.
+- Pepe: Te regalo un dato, Byte: mañana la policía hace una redada. Andá atenta.
