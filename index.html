@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="theme-color" content="#0e1015">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="GTA">
+  <meta name="description" content="Práctica de SQL (DDL, DML y DQL) en forma de juego: manejá por Santa Bruma y armá la base de datos clandestina de la Familia Ceibo.">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="GTA SQL — Bajo Mundo de Datos">
+  <meta property="og:description" content="Práctica de SQL (DDL, DML y DQL) en forma de juego: manejá por Santa Bruma y armá la base de datos clandestina de la Familia Ceibo.">
+  <meta property="og:image" content="./story/splash/splash-start.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="GTA SQL — Bajo Mundo de Datos">
+  <meta name="twitter:description" content="Práctica de SQL (DDL, DML y DQL) en forma de juego: manejá por Santa Bruma y armá la base de datos clandestina de la Familia Ceibo.">
+  <meta name="twitter:image" content="./story/splash/splash-start.png">
+  <link rel="manifest" href="./manifest.webmanifest">
+  <link rel="icon" type="image/svg+xml" href="./story/favicon.svg">
+  <link rel="shortcut icon" href="./story/favicon.svg">
+  <link rel="apple-touch-icon" sizes="180x180" href="./icon-180.png">
+  <title>GTA SQL — Bajo Mundo de Datos</title>
+  <link rel="stylesheet" href="./styles/main.css?v=42">
+  <link rel="stylesheet" href="./styles/sql-console.css?v=1">
+</head>
+<body>
+  <div id="game-shell">
+    <canvas id="game-canvas" aria-label="Área del juego"></canvas>
+    <img id="world-pickup-item" class="world-pickup-item hidden" alt="">
+    <div id="world-collectibles-layer" aria-hidden="true"></div>
+    <div id="npc-speech-layer" aria-hidden="true"></div>
+    <div id="damage-flash" aria-hidden="true"></div>
+
+    <div id="hud-layer" class="hidden" aria-live="polite">
+      <div id="top-left-stack">
+        <div id="top-bar">
+          <div id="vehicle-badge" class="hud-pill">
+            <span id="vehicle-status">A pie</span>
+          </div>
+          <div id="health-badge" class="hud-pill hud-health-stack">
+            <div class="hud-health-row" title="Vida del personaje">
+              <div class="health-track"><div id="health-fill" class="health-fill"></div></div>
+              <span id="health-value">100</span>
+            </div>
+            <div id="vehicle-health-badge" class="hud-health-row disabled" title="Integridad del vehículo">
+              <div class="health-track"><div id="vehicle-health-fill" class="health-fill"></div></div>
+              <span id="vehicle-health-value">--</span>
+            </div>
+          </div>
+        </div>
+        <div class="hud-quick-actions">
+          <button id="pause-button" type="button" class="hud-pill pause-button hud-action-btn" aria-label="Abrir menú" title="Menú">
+            <svg class="hud-action-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <line x1="4" y1="6.5" x2="20" y2="6.5"></line>
+              <line x1="4" y1="12" x2="20" y2="12"></line>
+              <line x1="4" y1="17.5" x2="20" y2="17.5"></line>
+            </svg>
+          </button>
+          <button id="inventory-button" type="button" class="hud-pill pause-button hud-action-btn" aria-label="Abrir inventario (0 de 5)" title="Objetos">
+            <svg class="hud-action-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M9 6V4.8A1.8 1.8 0 0 1 10.8 3h2.4A1.8 1.8 0 0 1 15 4.8V6"></path>
+              <path d="M5.5 9.5A3.5 3.5 0 0 1 9 6h6a3.5 3.5 0 0 1 3.5 3.5V19a2 2 0 0 1-2 2h-9a2 2 0 0 1-2-2V9.5Z"></path>
+              <path d="M5.5 11.5h13"></path>
+              <rect x="9" y="14" width="6" height="4" rx="1"></rect>
+            </svg>
+            <span id="inventory-badge" class="hud-action-badge">0/5</span>
+          </button>
+        </div>
+        <div id="hud-bg-progress" class="hud-pill hud-bg-progress hidden" aria-hidden="true">
+          <div class="progress-track hud-bg-progress-track">
+            <div id="hud-bg-progress-fill" class="progress-fill"></div>
+          </div>
+        </div>
+        <div id="location-badge" class="hud-pill" aria-label="Ubicación actual">
+          <svg class="hud-location-pin" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M12 21s-6.5-5.6-6.5-11a6.5 6.5 0 1 1 13 0c0 5.4-6.5 11-6.5 11Z"></path>
+            <circle cx="12" cy="10" r="2.3"></circle>
+          </svg>
+          <span id="location-code">---</span>
+        </div>
+      </div>
+
+      <div id="hud-toast" class="hud-pill hud-toast hidden" role="status" aria-live="polite">
+        <img id="hud-toast-img" class="hud-toast-img hidden" alt="">
+        <span id="hud-toast-text"></span>
+      </div>
+
+      <div id="mission-banner" class="mission-banner hidden" role="status" aria-live="polite">
+        <div id="mission-banner-title" class="mission-banner-title"></div>
+        <div id="mission-banner-objective" class="mission-banner-objective"></div>
+      </div>
+
+      <div id="minimap-container" role="button" tabindex="0" aria-label="Ampliar minimapa" title="Ampliar mapa (M)">
+        <canvas id="minimap-canvas" width="204" height="204"></canvas>
+        <div id="objective-hint">Libre</div>
+      </div>
+
+      <div id="controls-hint" class="hud-pill">
+        Flechas/WASD: Mover · Espacio: Acción/Acelerar · Shift/X: Freno/Reversa · I/Tab: Inventario · M: Mapa · Espacio+Shift: Salir
+      </div>
+
+      <div id="touch-controls" class="hidden" aria-label="Controles virtuales">
+        <div id="touch-analog" class="touch-cluster touch-analog" role="application" aria-label="Direccional analógico virtual">
+          <div id="touch-analog-knob" class="touch-analog-knob"></div>
+          <svg id="touch-steering-wheel" class="touch-steering-wheel" viewBox="0 0 100 100" aria-hidden="true">
+            <circle cx="50" cy="50" r="38" fill="none" stroke="currentColor" stroke-width="8"/>
+            <circle cx="50" cy="50" r="10" fill="currentColor" fill-opacity="0.35" stroke="currentColor" stroke-width="3"/>
+            <line x1="14" y1="50" x2="40" y2="50" stroke="currentColor" stroke-width="7" stroke-linecap="round"/>
+            <line x1="60" y1="50" x2="86" y2="50" stroke="currentColor" stroke-width="7" stroke-linecap="round"/>
+            <line x1="50" y1="60" x2="50" y2="86" stroke="currentColor" stroke-width="7" stroke-linecap="round"/>
+            <path d="M44 13 L50 7 L56 13" fill="none" stroke="#fbbf24" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+
+        <div id="touch-actions" class="touch-cluster">
+          <button type="button" class="touch-btn touch-secondary-btn touch-exit hidden" data-btn="exit" aria-label="Bajar del vehículo" title="Bajar del vehículo">
+            <svg class="touch-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M13 4H6a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h7"/>
+              <path d="M10 12h10"/>
+              <path d="M17 8l4 4-4 4"/>
+            </svg>
+          </button>
+          <button type="button" class="touch-btn touch-secondary-btn touch-brake hidden" data-btn="secondary" aria-label="Frenar o reversa" title="Frenar o reversa">
+            <svg class="touch-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M7 7l5 5 5-5"/>
+              <path d="M7 13l5 5 5-5"/>
+            </svg>
+          </button>
+          <button type="button" class="touch-btn touch-action touch-primary" data-btn="action" aria-label="Acción" title="Acción">
+            <svg class="touch-icon touch-icon-hand" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M18 11V6a2 2 0 0 0-4 0v4"/>
+              <path d="M14 10V4a2 2 0 0 0-4 0v6"/>
+              <path d="M10 10.5V6a2 2 0 0 0-4 0v8"/>
+              <path d="M18 8a2 2 0 1 1 4 0v6a8 8 0 0 1-8 8h-2c-2.8 0-4.5-.9-5.9-2.5L3.3 15.8a2 2 0 0 1 2.9-2.7L8 15"/>
+            </svg>
+            <svg class="touch-icon touch-icon-accel hidden" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M7 17l5-5 5 5"/>
+              <path d="M7 11l5-5 5 5"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <section id="start-screen" class="overlay-screen start-screen hidden">
+      <div class="start-backdrop" aria-hidden="true">
+        <img id="start-splash-bg" class="start-splash-bg hidden" alt="">
+        <img id="start-splash" class="start-splash hidden" alt="Portada de la historia">
+        <div class="start-scrim"></div>
+      </div>
+      <div class="start-card">
+        <h1 id="start-title" class="retro-title">CIUDAD ABIERTA</h1>
+        <p id="start-subtitle" class="overlay-subtitle">Explorá la ciudad, entrá a los locales de planta baja y manejá autos, motos y camionetas.</p>
+        <div id="start-loading-box" class="start-loading-box">
+          <div class="progress-track start-progress-track">
+            <div id="start-loading-bar" class="progress-fill"></div>
+          </div>
+          <div class="start-loading-meta">
+            <span id="start-loading-text" class="start-loading-text">Preparando recursos de la primera misión...</span>
+            <span id="start-loading-percent" class="start-loading-percent">0%</span>
+          </div>
+        </div>
+        <div class="start-actions">
+          <button id="start-button" type="button" class="primary-button" disabled>Cargando...</button>
+          <button id="new-game-button" type="button" class="secondary-button hidden" disabled>Nuevo juego</button>
+        </div>
+        <p id="ios-install-hint" class="ios-install-hint hidden">En iPhone, para pantalla completa sin barra: Compartir → Agregar a pantalla de inicio.</p>
+      </div>
+    </section>
+
+    <section id="loading-screen" class="overlay-screen" role="status" aria-live="polite">
+      <div class="overlay-card loading-card">
+        <h2 class="overlay-heading">Cargando ciudad...</h2>
+        <div class="progress-track">
+          <div id="loading-bar" class="progress-fill"></div>
+        </div>
+        <div class="loading-meta">
+          <p id="loading-text" class="overlay-subtitle">Preparando mapa y texturas</p>
+          <span id="loading-percent" class="loading-percent">0%</span>
+        </div>
+      </div>
+    </section>
+
+    <section id="error-screen" class="overlay-screen hidden" role="alert">
+      <div class="overlay-card error-card">
+        <h2 class="overlay-heading">No se pudo iniciar el juego</h2>
+        <p id="error-message" class="error-message"></p>
+      </div>
+    </section>
+
+    <section id="gameover-screen" class="overlay-screen gameover-overlay hidden" role="alert">
+      <div class="overlay-card gameover-card">
+        <h2 class="gameover-title">¡TE FUE MAL!</h2>
+        <p id="gameover-reason" class="overlay-subtitle"></p>
+        <button id="restart-button" type="button" class="primary-button">Reiniciar</button>
+      </div>
+    </section>
+
+    <section id="cutscene-screen" class="overlay-screen cutscene-overlay hidden" aria-live="polite">
+      <div class="cutscene-stage">
+        <div id="cutscene-bg-label" class="cutscene-bg-label">Escena lateral</div>
+        <div class="cutscene-actors">
+          <div id="cutscene-left-slot" class="cutscene-actor">
+            <img id="cutscene-left-img" class="cutscene-portrait" alt="">
+            <span id="cutscene-left-name" class="cutscene-actor-name"></span>
+          </div>
+          <div id="cutscene-right-slot" class="cutscene-actor">
+            <img id="cutscene-right-img" class="cutscene-portrait" alt="">
+            <span id="cutscene-right-name" class="cutscene-actor-name"></span>
+          </div>
+        </div>
+        <div class="cutscene-dialog-box">
+          <div id="cutscene-speaker" class="cutscene-speaker"></div>
+          <p id="cutscene-text" class="cutscene-text"></p>
+          <div id="cutscene-choices" class="cutscene-choices hidden"></div>
+          <div class="cutscene-actions">
+            <button id="cutscene-link-btn" type="button" class="cutscene-link-btn hidden">Ver el enlace</button>
+            <button id="cutscene-next-btn" type="button" class="primary-button cutscene-next-btn">Continuar</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="mission-complete-screen" class="overlay-screen hidden" aria-live="polite">
+      <div class="overlay-card mission-complete-card">
+        <h2 id="mission-complete-title" class="retro-title">MISIÓN CUMPLIDA</h2>
+        <p id="mission-complete-subtitle" class="overlay-subtitle"></p>
+        <button id="mission-complete-btn" type="button" class="primary-button">Continuar</button>
+      </div>
+    </section>
+
+    <section id="pause-screen" class="overlay-screen hidden" role="dialog" aria-label="Menú de pausa">
+      <div class="overlay-card pause-card">
+        <h2 class="retro-title">PAUSA</h2>
+        <div class="pause-actions">
+          <button id="pause-resume-btn" type="button" class="primary-button">CONTINUAR</button>
+          <button id="pause-restart-btn" type="button" class="secondary-button">REINICIAR MISIÓN</button>
+          <button id="pause-choose-btn" type="button" class="secondary-button">ELEGIR MISIÓN</button>
+          <button id="pause-new-game-btn" type="button" class="secondary-button">NUEVO JUEGO</button>
+          <button id="pause-refresh-assets-btn" type="button" class="secondary-button">RECARGAR RECURSOS</button>
+          <button id="pause-reset-game-btn" type="button" class="secondary-button">REINICIAR TODO EL JUEGO</button>
+          <button id="pause-exit-btn" type="button" class="danger-button">SALIR</button>
+        </div>
+      </div>
+    </section>
+
+    <section id="mission-select-screen" class="overlay-screen hidden" role="dialog" aria-label="Elegir misión">
+      <div class="overlay-card mission-select-card">
+        <h2 class="retro-title">ELEGIR MISIÓN</h2>
+        <div id="pause-mission-list" class="pause-mission-list"></div>
+        <button id="mission-select-back-btn" type="button" class="secondary-button mission-select-back-btn">Volver</button>
+      </div>
+    </section>
+
+    <section id="expanded-map-screen" class="overlay-screen hidden" role="dialog" aria-label="Mapa ampliado">
+      <div class="overlay-card expanded-map-card">
+        <div class="expanded-map-header">
+          <div>
+            <h2 class="retro-title expanded-map-title">MAPA DE LA CIUDAD</h2>
+            <p id="expanded-map-objective" class="overlay-subtitle expanded-map-objective">Exploración libre</p>
+          </div>
+          <button id="expanded-map-close-btn" type="button" class="secondary-button expanded-map-close-btn">Volver</button>
+        </div>
+        <div class="expanded-map-stage">
+          <canvas id="expanded-map-canvas"></canvas>
+          <div class="expanded-map-zoom-controls" aria-label="Controles de zoom del mapa">
+            <button id="expanded-map-zoom-in-btn" type="button" class="secondary-button expanded-map-zoom-btn" aria-label="Acercar">+</button>
+            <button id="expanded-map-zoom-reset-btn" type="button" class="secondary-button expanded-map-zoom-btn expanded-map-zoom-level" aria-label="Restablecer zoom">1×</button>
+            <button id="expanded-map-zoom-out-btn" type="button" class="secondary-button expanded-map-zoom-btn" aria-label="Alejar">−</button>
+          </div>
+        </div>
+        <div class="expanded-map-legend">
+          <span class="legend-chip"><i class="legend-dot legend-player"></i> Vos</span>
+          <span class="legend-chip"><i class="legend-dot legend-target"></i> Destino</span>
+          <span class="legend-chip"><i class="legend-dot legend-route"></i> Ruta</span>
+          <span class="legend-chip"><i class="legend-dot legend-extra"></i> Extras (?)</span>
+          <span class="legend-chip"><i class="legend-dot legend-hospital"></i> Hospitales</span>
+        </div>
+      </div>
+    </section>
+
+    <section id="web-modal-screen" class="overlay-screen hidden" role="dialog" aria-modal="true" aria-label="Visor web">
+      <div class="overlay-card web-modal-card">
+        <div class="web-modal-header">
+          <div class="web-modal-title-group">
+            <h2 id="web-modal-title" class="retro-title web-modal-title">SITIO EXTERNO</h2>
+            <p id="web-modal-url" class="overlay-subtitle web-modal-url"></p>
+          </div>
+          <div class="web-modal-actions">
+            <button id="web-modal-external-btn" type="button" class="web-modal-external-btn">Abrir en el navegador externo</button>
+            <button id="web-modal-close-btn" type="button" class="secondary-button web-modal-close-btn">Cerrar</button>
+          </div>
+        </div>
+        <div class="web-modal-stage">
+          <div id="web-modal-loading" class="web-modal-loading">Cargando sitio...</div>
+          <iframe
+            id="web-modal-iframe"
+            class="web-modal-iframe"
+            title="Contenido externo"
+            referrerpolicy="no-referrer-when-downgrade"
+          ></iframe>
+        </div>
+        <p id="web-modal-hint" class="web-modal-hint">Desplazate con el mouse, el dedo o las flechas. Si el sitio no carga acá, usá "Abrir en el navegador externo".</p>
+      </div>
+    </section>
+
+    <section id="inventory-screen" class="overlay-screen hidden" role="dialog" aria-label="Inventario">
+      <div id="inventory-speech-layer" class="inventory-speech-layer" aria-hidden="true"></div>
+      <div class="overlay-card inventory-card">
+        <div class="inventory-header">
+          <div>
+            <h2 id="inventory-title" class="retro-title inventory-title">INVENTARIO</h2>
+            <p id="inventory-subtitle" class="overlay-subtitle inventory-subtitle">Elegí un objeto para ver los detalles.</p>
+          </div>
+          <span id="inventory-count" class="inventory-count">0 / 10</span>
+        </div>
+        <div id="inventory-grid" class="inventory-grid" role="grid" aria-label="Cuadrícula de 10 espacios"></div>
+        <div class="inventory-pagination" role="navigation" aria-label="Páginas del inventario">
+          <button id="inventory-prev-page" type="button" class="inventory-page-btn" aria-label="Página anterior" title="Página anterior (Q / L1)" disabled>&#9664;</button>
+          <span id="inventory-page-label" class="inventory-page-label">Página 1 / 1</span>
+          <button id="inventory-next-page" type="button" class="inventory-page-btn" aria-label="Página siguiente" title="Página siguiente (E / R1)" disabled>&#9654;</button>
+        </div>
+        <div id="inventory-detail" class="inventory-detail">
+          <div id="inventory-detail-name" class="inventory-detail-name">Espacio vacío</div>
+          <div id="inventory-detail-desc" class="inventory-detail-desc">Ningún objeto seleccionado.</div>
+        </div>
+        <p id="inventory-feedback" class="inventory-feedback hidden" role="status"></p>
+        <div class="inventory-actions">
+          <button id="inventory-deliver-btn" type="button" class="primary-button hidden">Entregar objeto</button>
+          <button id="inventory-close-btn" type="button" class="secondary-button">Cerrar</button>
+        </div>
+      </div>
+    </section>
+
+    <section id="confirm-screen" class="overlay-screen hidden" role="dialog" aria-modal="true" aria-labelledby="confirm-title">
+      <div class="overlay-card confirm-card">
+        <h2 id="confirm-title" class="overlay-heading">¿INICIAR NUEVO JUEGO?</h2>
+        <p id="confirm-message" class="overlay-subtitle">Al iniciar un nuevo juego, se perderá todo el progreso actual. ¿Querés continuar?</p>
+        <div class="confirm-actions">
+          <button id="confirm-cancel-btn" type="button" class="secondary-button">Cancelar</button>
+          <button id="confirm-accept-btn" type="button" class="danger-button">Iniciar nuevo juego</button>
+        </div>
+      </div>
+    </section>
+
+    <section id="assets-refresh-screen" class="overlay-screen hidden" role="dialog" aria-modal="true" aria-labelledby="assets-refresh-title">
+      <div class="overlay-card assets-refresh-card">
+        <h2 id="assets-refresh-title" class="overlay-heading">RECARGANDO RECURSOS</h2>
+        <div class="progress-track">
+          <div id="assets-refresh-bar" class="progress-fill"></div>
+        </div>
+        <div class="loading-meta">
+          <p id="assets-refresh-text" class="overlay-subtitle">Preparando actualización...</p>
+          <span id="assets-refresh-percent" class="loading-percent">0%</span>
+        </div>
+        <div class="confirm-actions">
+          <button id="assets-refresh-action-btn" type="button" class="secondary-button">Cancelar</button>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <script>
+    (function () {
+      const showBootError = (msg) => {
+        const loading = document.getElementById('loading-screen');
+        const errorScreen = document.getElementById('error-screen');
+        const errorMessage = document.getElementById('error-message');
+        if (!loading || loading.classList.contains('hidden') || !errorScreen || !errorMessage) return;
+        loading.classList.add('hidden');
+        errorMessage.textContent = msg + ' Probá recargar la página con Cmd+Shift+R (o Ctrl+Shift+R).';
+        errorScreen.classList.remove('hidden');
+      };
+      window.addEventListener('error', (ev) => {
+        if (!window.__gameBooted) {
+          showBootError(ev?.message || 'Error al cargar los módulos del juego.');
+        }
+      });
+      window.addEventListener('unhandledrejection', (ev) => {
+        if (!window.__gameBooted) {
+          showBootError(ev?.reason?.message || 'Error inesperado durante la carga.');
+        }
+      });
+    })();
+  </script>
+  <script type="module" src="./src/main.js?v=78"></script>
+  <script type="module" src="./src/sql/sql-console.js?v=1"></script>
+</body>
+</html>
