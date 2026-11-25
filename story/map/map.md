@@ -66,7 +66,7 @@ RUA-61: Av. Bolivia
 RUA-62: Rambla República de México
 
 ## Plazas
-PRACA-01: Plaza del Cerro
+PRACA-01: Plaza del Barrio Ceibo
 PRACA-02: Plaza del Prado
 PRACA-03: Plaza Atahualpa
 PRACA-04: Plaza de Sayago
