@@ -1,6 +1,7 @@
 // Terminal SQL del juego: consola por fases (misiones) + práctica libre + reporte de avance.
 import { SqlEngine, splitStatements } from './sql-engine.js';
 import { PHASES, MISSIONS, DB_NAME, phasesFor, rebuildState } from './challenges.js';
+import { renderGuide } from './guide.js';
 
 const KEY_DB = 'gtasql.db.v1';
 const KEY_PROGRESS = 'gtasql.progress.v1';
@@ -106,7 +107,8 @@ function buildUi() {
   const consigna = h('div', { class: 'sqlc-consigna' });
   const feedback = h('div', { class: 'sqlc-feedback', role: 'status', 'aria-live': 'polite' });
   const nextBtn = h('button', { type: 'button', class: 'sqlc-btn sqlc-btn-success', hidden: true, onclick: () => goNext() }, 'Continuar ▶');
-  const left = h('section', { class: 'sqlc-left', 'aria-label': 'Consigna' }, steps, consigna, feedback, nextBtn);
+  const guide = h('section', { class: 'sqlc-guide', 'aria-label': 'Instructivo de comandos SQL' });
+  const left = h('section', { class: 'sqlc-left', 'aria-label': 'Consigna' }, steps, consigna, feedback, nextBtn, guide);
 
   const log = h('div', { class: 'sqlc-log', 'aria-live': 'polite', 'aria-label': 'Resultados' });
   const editor = h('textarea', {
@@ -148,7 +150,7 @@ function buildUi() {
     }
   });
 
-  ui = { root, title, subtitle, gradeChip, steps, consigna, feedback, nextBtn, log, editor, schema, copyBtn, left };
+  ui = { root, title, subtitle, gradeChip, steps, consigna, feedback, nextBtn, log, editor, schema, copyBtn, left, guide };
   return ui;
 }
 
@@ -204,6 +206,7 @@ function renderLeft() {
           <li>Creá una tabla <code>arma</code> relacionada con <code>miembro</code> y cargale datos.</li>
         </ol></div>`;
     u.copyBtn.hidden = true;
+    renderGuide(u.guide, { kind: null });
     return;
   }
   u.copyBtn.hidden = false;
@@ -217,6 +220,7 @@ function renderLeft() {
     u.steps.append(h('li', { class: `sqlc-step ${cls}`, title: q.title }, h('span', { class: 'sqlc-step-dot', 'aria-hidden': 'true' }, done ? '✔' : String(PHASES.indexOf(q) + 1)), h('span', { class: 'sqlc-step-label' }, q.title), done ? h('span', { class: 'sr-only' }, ' (lograda)') : null));
   });
   u.consigna.innerHTML = `<div class="sqlc-kind sqlc-kind-${p.kind.toLowerCase()}">${p.kind}</div><h3>${esc(p.title)}</h3>${p.consigna}`;
+  renderGuide(u.guide, { kind: p.kind, phaseId: p.id });
   if (progress.completed[p.id]) showSuccess(p, true);
 }
 
