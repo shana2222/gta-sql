@@ -145,7 +145,7 @@
 .sqlc-muted { color: var(--c-muted); }
 
 .sqlc-fab {
-  position: fixed; left: 50%; transform: translateX(-50%); bottom: 12px; z-index: 60;
+  position: fixed; right: 14px; bottom: 56px; z-index: 60;
   font: 800 15px/1 system-ui, sans-serif; padding: 10px 16px; border-radius: 999px; cursor: pointer;
   background: #ffb000; color: #1a1200; border: 2px solid #1a1200; box-shadow: 0 4px 0 #1a1200, 0 8px 20px rgba(0,0,0,.35);
 }

@@ -1,4 +1,4 @@
-export const SAVE_STORAGE_KEY = 'gta-cv-save-v1';
+export const SAVE_STORAGE_KEY = 'gta-sql-save-v1';
 
 function getDefaultStorage() {
   if (typeof window !== 'undefined' && window.localStorage) {

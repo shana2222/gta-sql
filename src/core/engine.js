@@ -25,7 +25,7 @@ import {
 } from '../physics/vehicle-physics.js?v=18';
 import { Minimap } from '../ui/minimap.js?v=27';
 import { Inventory } from './inventory.js?v=20';
-import { createSaveSnapshot, saveGameState } from './save-state.js?v=2';
+import { createSaveSnapshot, saveGameState } from './save-state.js?v=3';
 import { getPendingMissionAssetUrls, preloadMissionAssets } from '../story/story-loader.js';
 
 const PEDESTRIAN_CHAT_LINES = [
@@ -811,6 +811,42 @@ export class Engine {
     }
   }
 
+  /** Insignia SVG (data URL) para el techo de un edificio con misiones ganadas. */
+  static completedBadgeUrl(missionNumbers) {
+    const label = missionNumbers.map((n) => `M${n}`).join(' ');
+    const fs = label.length > 8 ? 15 : label.length > 5 ? 19 : 24;
+    const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 128 128">`
+      + `<g transform="translate(64 54)">`
+      + Array.from({ length: 12 }, (_, i) => `<path d="M0 -50 L9 -38 L-9 -38Z" fill="#ffb000" transform="rotate(${i * 30})"/>`).join('')
+      + `<circle r="40" fill="#1a7f37" stroke="#ffb000" stroke-width="6"/>`
+      + `<path d="M-20 0 L-6 14 L22 -16" fill="none" stroke="#fff" stroke-width="11" stroke-linecap="round" stroke-linejoin="round"/></g>`
+      + `<rect x="${64 - Math.min(60, 10 + label.length * fs * 0.32)}" y="94" width="${Math.min(120, 20 + label.length * fs * 0.64)}" height="30" rx="8" fill="#ffb000" stroke="#1a1200" stroke-width="3"/>`
+      + `<text x="64" y="${110 + fs * 0.35}" text-anchor="middle" font-family="Arial Black, Arial, sans-serif" font-weight="900" font-size="${fs}" fill="#1a1200">${label}</text></svg>`;
+    return `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}`;
+  }
+
+  /** Mapa de techos especiales: encuentros + edificios con misiones ganadas (insignia de completada). */
+  #roofMarks() {
+    const missions = this.storyPackage?.missions || [];
+    const doneCount = this.freeRoamMode ? missions.length : Math.min(this.currentMissionIndex, missions.length);
+    const key = `${doneCount}|${missions.length}|${this.encounterLocationCodes.size}`;
+    if (this._roofMarksKey === key && this._roofMarks) return this._roofMarks;
+    const marks = new Map(this.encounterLocationCodes);
+    const byLocation = new Map();
+    for (let i = 0; i < doneCount; i += 1) {
+      const loc = missions[i]?.targetLocation;
+      if (!loc || this.encounterLocationCodes.has(loc)) continue;
+      if (!byLocation.has(loc)) byLocation.set(loc, []);
+      byLocation.get(loc).push(i + 1);
+    }
+    for (const [loc, nums] of byLocation) {
+      marks.set(loc, { roofColor: '#14532d', roofLogo: Engine.completedBadgeUrl(nums), completed: nums });
+    }
+    this._roofMarksKey = key;
+    this._roofMarks = marks;
+    return marks;
+  }
+
   #findNearbyEncounterNpc() {
     if (this.player.inVehicleId || !this.player.insideLocationCode) return null;
     for (const npc of this.encounterNpcs) {
@@ -1073,7 +1109,7 @@ export class Engine {
       window.innerWidth,
       window.innerHeight,
       this.expandedMapView,
-      this.encounterLocationCodes,
+      this.#roofMarks(),
     );
   }
 
@@ -2188,7 +2224,7 @@ export class Engine {
       objectivePoint: hideTargetNpc ? null : this.objectivePoint,
       objectiveNpcPoint: hideTargetNpc ? null : this.objectiveNpcPoint,
       completedNpcPoints: [...this.completedNpcPoints, ...this.encounterNpcs],
-      encounterLocations: this.encounterLocationCodes,
+      encounterLocations: this.#roofMarks(),
       emitNpcWaves: !hideTargetNpc && Boolean(this.objectiveNpcPoint || this.objectivePoint),
       time: this.elapsedTime
     });
@@ -2234,7 +2270,7 @@ export class Engine {
       this.routePoints,
       this.objectivePoint,
       this.worldCollectibles,
-      this.encounterLocationCodes,
+      this.#roofMarks(),
     );
     if (this.hud.isExpandedMapOpen()) {
       this.#renderExpandedMap();

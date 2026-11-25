@@ -1,4 +1,4 @@
-import { Engine } from './core/engine.js?v=57';
+import { Engine } from './core/engine.js?v=58';
 import { HudController } from './ui/hud-controller.js?v=41';
 import { CutsceneController } from './ui/cutscene-controller.js?v=15';
 import { PauseMenuController } from './ui/pause-menu.js?v=6';
@@ -10,7 +10,7 @@ import {
   loadGameState,
   clearGameState,
   formatContinueLabel
-} from './core/save-state.js?v=2';
+} from './core/save-state.js?v=3';
 import {
   loadStorySplashHeader,
   loadStoryPackage,
