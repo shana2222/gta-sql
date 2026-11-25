@@ -153,7 +153,8 @@ test('map/map.md mapeia todos os locais da cidade e substitui códigos em falas 
   const locationNames = parseMapMarkdown(mapRaw, 'map/map.md');
 
   assert.equal(locationNames.get('CASA-01'), 'Guarida de la Familia Ceibo');
-  assert.equal(locationNames.get('RUA-01'), 'Av. 18 de Julio');
+  assert.equal(locationNames.get('RUA-18'), 'Av. 18 de Julio');
+  assert.equal(locationNames.get('RUA-31'), 'Rambla Sur');
   assert.equal(locationNames.get('COM-320'), 'Taller de Chispa');
 
   for (const code of cityMap.locationsByCode.keys()) {
@@ -164,7 +165,7 @@ test('map/map.md mapeia todos os locais da cidade e substitui códigos em falas 
   const speech = 'llevá esto a la CASA-01 por la RUA-02';
   assert.equal(
     replaceLocationCodesWithNames(speech, locationNames),
-    'llevá esto a la Guarida de la Familia Ceibo por la Rambla Sur'
+    'llevá esto a la Guarida de la Familia Ceibo por la Av. Millán'
   );
 });
 

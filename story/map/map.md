@@ -2,106 +2,106 @@
 # Mapa de la Ciudad
 
 ## Calles
-RUA-01: Av. 18 de Julio
-RUA-02: Rambla Sur
-RUA-03: Bulevar Artigas
-RUA-04: Av. Italia
-RUA-05: Calle Ceibo
-RUA-06: Av. del Puerto
-RUA-07: Calle Colonia
-RUA-08: Calle Mercedes
-RUA-09: Av. Rivera
-RUA-10: Calle Paysandú
-RUA-11: Calle Soriano
-RUA-12: Calle Canelones
-RUA-13: Av. Agraciada
-RUA-14: Calle Rondeau
-RUA-15: Av. Libertador
-RUA-16: Calle Sarandí
-RUA-17: Calle Rincón
-RUA-18: Calle Cerrito
-RUA-19: Calle Piedras
-RUA-20: Av. Brasil
-RUA-21: Calle Durazno
-RUA-22: Calle Maldonado
-RUA-23: Calle Gonzalo Ramírez
-RUA-24: Calle Isla de Flores
-RUA-25: Av. Millán
-RUA-26: Calle Constituyente
-RUA-27: Calle Jackson
-RUA-28: Calle Requena
-RUA-29: Av. Garibaldi
-RUA-30: Calle Cufré
-RUA-31: Calle Yaguarón
-RUA-32: Calle Ejido
-RUA-33: Calle Tacuarembó
-RUA-34: Av. Larrañaga
-RUA-35: Calle Hocquart
-RUA-36: Av. Las Palmeras
-RUA-37: Calle Los Pinos
-RUA-38: Calle Las Acacias
-RUA-39: Calle Los Jacarandás
-RUA-40: Calle Los Naranjos
-RUA-41: Rambla Norte
-RUA-42: Calle del Comercio
-RUA-43: Calle Libertad
-RUA-44: Calle Buena Vista
-RUA-45: Calle Bella Vista
-RUA-46: Calle Salto
-RUA-47: Calle Rocha
-RUA-48: Calle Florida
-RUA-49: Calle Artigas
-RUA-50: Calle Treinta y Tres
-RUA-51: Calle Lavalleja
-RUA-52: Av. de los Trabajadores
-RUA-53: Calle de la Esperanza
-RUA-54: Calle de la Paz
-RUA-55: Calle de la Alegría
-RUA-56: Calle Gardel
-RUA-57: Calle Zitarrosa
-RUA-58: Calle Figari
-RUA-59: Calle Torres García
-RUA-60: Calle Varela
-RUA-61: Av. Centenario
-RUA-62: Calle Vaz Ferreira
+RUA-01: Rambla Portuaria
+RUA-02: Av. Millán
+RUA-03: Av. Suárez
+RUA-04: Av. Agraciada
+RUA-05: Av. Gral. Flores
+RUA-06: Domingo Aramburú
+RUA-07: Valparaíso
+RUA-08: Av. de las Leyes
+RUA-09: Miguelete
+RUA-10: Nueva York
+RUA-11: La Paz
+RUA-12: Galicia
+RUA-13: Cerro Largo
+RUA-14: Paysandú
+RUA-15: Uruguay
+RUA-16: Mercedes
+RUA-17: Colonia
+RUA-18: Av. 18 de Julio
+RUA-19: San José
+RUA-20: Soriano
+RUA-21: Canelones
+RUA-22: Maldonado
+RUA-23: Durazno
+RUA-24: Isla de Flores
+RUA-25: Gonzalo Ramírez
+RUA-26: Lauro Müller
+RUA-27: Bv. España
+RUA-28: Av. Italia
+RUA-29: Av. Gral. Rivera
+RUA-30: Av. Brasil
+RUA-31: Rambla Sur
+RUA-32: Rambla Gran Bretaña
+RUA-33: Pérez Castellano
+RUA-34: Ituzaingó
+RUA-35: Juan Carlos Gómez
+RUA-36: Bartolomé Mitre
+RUA-37: Juncal
+RUA-38: Florida
+RUA-39: Río Negro
+RUA-40: Convención
+RUA-41: Andes
+RUA-42: Julio Herrera y Obes
+RUA-43: Río Branco
+RUA-44: Paraguay
+RUA-45: Yaguarón
+RUA-46: Ejido
+RUA-47: Santiago de Chile
+RUA-48: Javier Barrios Amorín
+RUA-49: Gaboto
+RUA-50: Tacuarembó
+RUA-51: Minas
+RUA-52: Magallanes
+RUA-53: Arenal Grande
+RUA-54: Fernández Crespo
+RUA-55: Joaquín Requena
+RUA-56: Bv. Artigas
+RUA-57: Av. Américo Ricaldoni
+RUA-58: Av. Luis A. de Herrera
+RUA-59: Av. Batlle y Ordóñez
+RUA-60: Av. Alfredo Arocena
+RUA-61: Av. Bolivia
+RUA-62: Rambla República de México
 
 ## Plazas
-PRACA-01: Plaza Matriz
-PRACA-02: Plaza Independencia
-PRACA-03: Plaza Cagancha
-PRACA-04: Plaza Fabini
-PRACA-05: Plaza de los Treinta y Tres
-PRACA-06: Plaza del Ceibo
-PRACA-07: Plaza Zabala
-PRACA-08: Plaza Seregni
-PRACA-09: Plaza del Puerto
-PRACA-10: Plaza de la Colina
-PRACA-11: Plaza Gomensoro
-PRACA-12: Plaza Varela
-PRACA-13: Plaza de las Palomas
-PRACA-14: Plaza del Mercado
-PRACA-15: Plaza Artigas
-PRACA-16: Plaza Lavalleja
-PRACA-17: Plaza de la Rambla
-PRACA-18: Plaza Los Halcones
-PRACA-19: Plaza del Faro
-PRACA-20: Plaza Mayor
-PRACA-21: Plaza Norte
-PRACA-22: Plaza Sur
-PRACA-23: Plaza Este
-PRACA-24: Plaza Oeste
-PRACA-25: Plaza Libertad
-PRACA-26: Plaza de la Estación
-PRACA-27: Plaza del Tango
-PRACA-28: Plaza del Candombe
-PRACA-29: Plaza de los Jacarandás
-PRACA-30: Plaza de los Pinos
-PRACA-31: Plaza Bella Vista
-PRACA-32: Plaza del Sol
-PRACA-33: Plaza de la Luna
-PRACA-34: Plaza Las Acacias
-PRACA-35: Plaza del Reloj
-PRACA-36: Plaza Primavera
+PRACA-01: Plaza del Cerro
+PRACA-02: Plaza del Prado
+PRACA-03: Plaza Atahualpa
+PRACA-04: Plaza de Sayago
+PRACA-05: Plaza de Malvín Norte
+PRACA-06: Plaza de Maroñas
+PRACA-07: Plaza de La Teja
+PRACA-08: Plaza de Capurro
+PRACA-09: Plaza del Reducto
+PRACA-10: Plaza Brazo Oriental
+PRACA-11: Plaza de Larrañaga
+PRACA-12: Plaza de la Unión
+PRACA-13: Plaza Zabala
+PRACA-14: Plaza de la Aguada
+PRACA-15: Plaza de Goes
+PRACA-16: Plaza Seregni
+PRACA-17: Plaza de La Comercial
+PRACA-18: Plaza Jacinto Vera
+PRACA-19: Plaza Matriz
+PRACA-20: Plaza Independencia
+PRACA-21: Plaza Fabini
+PRACA-22: Plaza Cagancha
+PRACA-23: Plaza de los Treinta y Tres
+PRACA-24: Plaza de la Bandera
+PRACA-25: Plaza España
+PRACA-26: Plaza Carlos Gardel
+PRACA-27: Plaza del Candombe
+PRACA-28: Parque Rodó
+PRACA-29: Plaza de Pocitos
+PRACA-30: Parque Batlle
+PRACA-31: Escollera Sarandí
+PRACA-32: Plaza Barrio Sur
+PRACA-33: Plaza Palermo
+PRACA-34: Plaza Trouville
+PRACA-35: Plaza Gomensoro
+PRACA-36: Plaza Virgilio
 
 ## Comercios
 COM-01: Bar El Sur
@@ -245,7 +245,7 @@ COM-138: Pescadería El Sur
 COM-139: Discoteca El Ceibo
 COM-140: Zapatería Doña Rosa
 COM-141: Club de Billar La Rueda
-COM-142: Verdulería Don Ramón
+COM-142: ISBO — Instituto Superior Brazo Oriental
 COM-143: Pescadería El Trébol
 COM-144: Tienda de Ropa Central
 COM-145: Discoteca El Progreso
@@ -288,7 +288,7 @@ COM-181: Boliche El Faro
 COM-182: Panadería El Sur
 COM-183: Desarmadero El Sur
 COM-184: Desarmadero La Rambla
-COM-185: Electrónica La Nueva
+COM-185: Palacio Legislativo
 COM-186: Estación de Servicio La Nueva
 COM-187: Hotel Los Primos
 COM-188: Joyería Don Julio
@@ -339,7 +339,7 @@ COM-232: Verdulería Los Amigos
 COM-233: Farmacia El Tano
 COM-234: Óptica El Rápido
 COM-235: Casa de Cambio El Faro
-COM-236: Farmacia El Sur
+COM-236: INET — Instituto Normal de Enseñanza Técnica
 COM-237: Taller Mecánico San Jorge
 COM-238: Casa de Empeño Buen Precio
 COM-239: Joyería La Rueda
@@ -478,12 +478,12 @@ COM-371: Zapatería La Nueva
 COM-372: Bazar Los Primos
 COM-373: Bar El Ceibo
 COM-374: Tienda de Ropa El Progreso
-COM-375: Bazar El Dorado
+COM-375: ESI — Escuela Superior de Informática
 COM-376: Joyería Santa Rita
 COM-377: Ciber Santa Rita
 COM-378: Bar El Tano
 COM-379: Panadería La Moderna
-COM-380: Carnicería El Tano
+COM-380: ITI — Instituto Tecnológico Informático
 COM-381: Hotel El Tano
 COM-382: Estación de Servicio El Sol
 COM-383: Almacén Don Ramón
@@ -522,7 +522,7 @@ COM-415: Casa de Cambio Santa Rita
 COM-416: Desarmadero La Bruma
 COM-417: Gomería La Favorita
 COM-418: Casa de Empeño El Pibe
-COM-419: Pizzería La Colina
+COM-419: Torre Ejecutiva
 COM-420: Ferretería El Paisano
 COM-421: Pizzería San Jorge
 COM-422: Carnicería La Nueva
@@ -544,7 +544,7 @@ COM-437: Boliche Central
 COM-438: Librería La Unión
 COM-439: Mueblería Don Tito
 COM-440: Boliche El Pibe
-COM-441: Ciber El Gallego
+COM-441: Palacio Salvo
 COM-442: Desarmadero La Perla
 COM-443: Heladería La Bruma
 COM-444: Zapatería La Unión
@@ -601,7 +601,7 @@ COM-494: Estación de Servicio Don Ramón
 COM-495: Parrillada El Ancla
 COM-496: Club de Billar El Rápido
 COM-497: Gomería La Nueva
-COM-498: Gimnasio La Rambla
+COM-498: Liceo 29
 COM-499: Bar La Rueda
 COM-500: Almacén La Rambla
 COM-501: Bazar Buen Precio
@@ -730,7 +730,7 @@ COM-623: Boliche El Dorado
 COM-624: Carnicería El Sur
 COM-625: Kiosco La Bruma
 COM-626: Joyería La Victoria
-COM-627: Barbería Don Tito
+COM-627: Ceibal
 COM-628: Barbería San Jorge
 COM-629: Videojuegos El Puerto
 COM-630: Ciber Los Halcones

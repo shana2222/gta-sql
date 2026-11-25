@@ -32,6 +32,26 @@ La misión no avanza hasta que la base (o el resultado de la consulta) cumple el
 
 Son **27 fases** en total. Además está el **Cuartel del Hacker** (CASA-63) y el botón **SQL** de la parte de abajo: abren una **práctica libre** sobre la misma base, que no cambia la nota.
 
+### Misiones nerds (bonus)
+
+Son **misiones del mundo libre**: están siempre en el mapa y se hacen en cualquier momento y en cualquier orden, entrando al edificio y hablando con el personaje. Hay siete centros con techo de color e ícono propio. Cada uno tiene **2 retos SQL de bonus** sobre su propia base. No cambian la nota, pero aparecen en el reporte.
+
+| Centro | Personaje | Base | Retos |
+|---|---|---|---|
+| 🤖 ITI — Instituto Tecnológico Informático | Profe Ohm | `iti_robotica` | `INSERT` · `WHERE` + `ORDER BY` |
+| 🎮 ISBO — Instituto Superior Brazo Oriental | Pixel | `isbo_juegos` | `AVG` + `GROUP BY` · `UPDATE` |
+| 💻 Ceibal | Tecla | `ceibal` | `COUNT` + `GROUP BY` · `JOIN` |
+| 🖥️ ESI — Escuela Superior de Informática | Kernel | `esi_servidor` | `CREATE TABLE` con `UNIQUE` · `ALTER … DEFAULT` |
+| 📚 Liceo 29 | Profe Ada | `liceo29_biblio` | `LIKE` · `UPDATE` |
+| 🔐 INET — Instituto Normal de Enseñanza Técnica | Profe Bit | `inet_cerraduras` | `UPDATE` sin `WHERE` (¡por única vez!) · `SUM` |
+| 🏛️ Palacio Legislativo | Delia (guía) | `palacio_visitas` | `INSERT` · `SUM` + `GROUP BY` |
+
+En el Palacio Legislativo hay una placa de homenaje a José "Pepe" Mujica, con datos de su trayectoria (diputado, senador y presidente de Uruguay entre 2010 y 2015).
+
+### La ciudad
+
+Los nombres siguen, de forma aproximada, el plano de Montevideo: la **Rambla** rodea la ciudad sobre el agua (Rambla Sur, Rambla Portuaria, Rambla Gran Bretaña, Rambla República de México), **Av. 18 de Julio** es la avenida principal, al norte corren Colonia, Mercedes, Uruguay, Paysandú…, al sur San José, Soriano, Canelones, Maldonado…, y de oeste a este se pasa de la Ciudad Vieja (Pérez Castellano, Ituzaingó) a Florida, Río Negro, Andes, Ejido, Tacuarembó y Bv. Artigas. La Plaza Independencia, el Palacio Salvo y la Torre Ejecutiva están juntos, sobre 18 de Julio.
+
 El modelo de datos es el mismo de la evaluación (BANDA, MIEMBRO, VEHICULO, MISION, PARTICIPA_MISION), con datos distintos.
 
 ## La terminal SQL

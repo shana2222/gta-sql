@@ -331,3 +331,9 @@
   .shanuki-credit .sk-logo { color: rgb(0, 0, 0) !important; text-shadow: none !important; box-shadow: none !important; background: rgb(255, 255, 255) !important; border-color: rgb(0, 0, 0) !important; }
   .shanuki-credit .sk-sep, .shanuki-credit .sk-by { color: rgb(0, 0, 0) !important; text-shadow: none !important; }
 }
+.sqlr-bonus-title { font-size: 16px; margin: 16px 0 8px; }
+.sqlr-bonus { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 8px; }
+.sqlr-bonus-item { display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 8px; border: 1px dashed var(--c-border); border-radius: 10px; opacity: .7; }
+.sqlr-bonus-item.done { border: 2px solid var(--c-success); background: var(--c-success-bg); opacity: 1; }
+.sqlr-bonus-icon { font-size: 24px; }
+.sqlr-bonus-item small { color: var(--c-muted); }

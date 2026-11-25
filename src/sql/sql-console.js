@@ -1,6 +1,6 @@
 // Terminal SQL del juego: consola por fases (misiones) + práctica libre + reporte de avance.
 import { SqlEngine, splitStatements } from './sql-engine.js';
-import { PHASES, MISSIONS, DB_NAME, phasesFor, rebuildState } from './challenges.js';
+import { PHASES, MISSIONS, DB_NAME, phasesFor, rebuildState, BONUS, CENTERS, seedBonus } from './challenges.js';
 import { renderGuide } from './guide.js';
 
 const KEY_DB = 'gtasql.db.v1';
@@ -181,6 +181,11 @@ function refreshChips() {
 }
 
 /* ---------------- render del panel izquierdo ---------------- */
+function phaseLabel(p) {
+  if (p.bonus) return `— Reto nerd ${BONUS.filter((b) => b.center === p.center).indexOf(p) + 1}: ${p.title} —`;
+  return `— Fase ${PHASES.indexOf(p) + 1}: ${p.title} —`;
+}
+
 function currentPhase() {
   return session?.mode === 'mission' ? session.queue[session.index] : null;
 }
@@ -217,14 +222,20 @@ function renderLeft() {
     return;
   }
   u.copyBtn.hidden = false;
-  const missionName = MISSIONS[p.mission] || '';
-  const globalIdx = PHASES.indexOf(p) + 1;
-  u.title.textContent = `Misión ${p.mission}: ${missionName}`;
-  u.subtitle.textContent = `Fase ${globalIdx} de ${PHASES.length} · ${p.kind} · ${p.title}`;
+  if (p.bonus) {
+    const c = CENTERS[p.center];
+    u.title.textContent = `${c.icon} Misión nerd: ${c.name}`;
+    u.subtitle.textContent = `Bonus (no cambia la nota) · Base ${c.db} · ${p.kind} · ${p.title}`;
+  } else {
+    const missionName = MISSIONS[p.mission] || '';
+    const globalIdx = PHASES.indexOf(p) + 1;
+    u.title.textContent = `Misión ${p.mission}: ${missionName}`;
+    u.subtitle.textContent = `Fase ${globalIdx} de ${PHASES.length} · ${p.kind} · ${p.title}`;
+  }
   session.queue.forEach((q, i) => {
     const done = Boolean(progress.completed[q.id]);
     const cls = i === session.index ? 'current' : done ? 'done' : 'todo';
-    u.steps.append(h('li', { class: `sqlc-step ${cls}`, title: q.title }, h('span', { class: 'sqlc-step-dot', 'aria-hidden': 'true' }, done ? '✔' : String(PHASES.indexOf(q) + 1)), h('span', { class: 'sqlc-step-label' }, q.title), done ? h('span', { class: 'sr-only' }, ' (lograda)') : null));
+    u.steps.append(h('li', { class: `sqlc-step ${cls}`, title: q.title }, h('span', { class: 'sqlc-step-dot', 'aria-hidden': 'true' }, done ? '✔' : String(q.bonus ? i + 1 : PHASES.indexOf(q) + 1)), h('span', { class: 'sqlc-step-label' }, q.title), done ? h('span', { class: 'sr-only' }, ' (lograda)') : null));
   });
   u.consigna.innerHTML = `<div class="sqlc-kind sqlc-kind-${p.kind.toLowerCase()}">${p.kind}</div><h3>${esc(p.title)}</h3>${p.consigna}`;
   renderGuide(u.guide, { kind: p.kind, phaseId: p.id });
@@ -374,6 +385,7 @@ function repairDb() {
   const completedSet = new Set(PHASES.filter((p) => progress.completed[p.id]).map((p) => p.id));
   engine = new SqlEngine(rebuildState(completedSet));
   const p = currentPhase();
+  if (p?.bonus) seedBonus(engine, p.center);
   p?.setup?.(engine);
   persist();
   renderSchema();
@@ -401,7 +413,7 @@ function goNext() {
     persist();
     renderLeft();
     renderSchema();
-    ui.log.append(h('div', { class: 'sqlc-sep' }, `— Fase ${PHASES.indexOf(currentPhase()) + 1}: ${currentPhase().title} —`));
+    ui.log.append(h('div', { class: 'sqlc-sep' }, phaseLabel(currentPhase())));
     ui.log.scrollTop = ui.log.scrollHeight;
     ui.editor.focus();
     return;
@@ -434,6 +446,11 @@ function close(solved) {
   ui.root.hidden = true;
   document.documentElement.classList.remove('sqlc-open');
   session = null;
+  if (s && s.prevDb !== undefined) {
+    // al salir de un reto nerd, volver a la base que se estaba usando
+    engine.state.current = s.prevDb && engine.state.databases[s.prevDb.toLowerCase()] ? engine.state.databases[s.prevDb.toLowerCase()].name : s.prevDb;
+    persist();
+  }
   // dejamos pasar un frame para que la tecla de acción no avance la escena
   setTimeout(() => { window.__sqlConsoleOpen = false; }, 120);
   if (s?.mode === 'free') s.onClose?.();
@@ -455,6 +472,21 @@ export function openSqlChallenge(challengeId, { onSolved, onCancel } = {}) {
     onSolved?.();
     return;
   }
+  if (targets[0].bonus) {
+    if (targets.every((p) => progress.completed[p.id])) {
+      showToast(`✔ Misión nerd de ${CENTERS[targets[0].center].name} ya lograda. ¡Volvé cuando quieras!`);
+      onSolved?.();
+      return;
+    }
+    const prevDb = seedBonus(engine, targets[0].center);
+    const first = targets.findIndex((p) => !progress.completed[p.id]);
+    session = { mode: 'mission', queue: targets, index: first, onSolved, onCancel, prevDb };
+    currentPhase()?.setup?.(engine);
+    persist();
+    open();
+    ui.log.append(h('div', { class: 'sqlc-sep' }, phaseLabel(currentPhase())));
+    return;
+  }
   const lastIdx = Math.max(...targets.map((p) => PHASES.indexOf(p)));
   // fases pendientes hasta la última pedida (no se puede saltar adelante)
   const queue = PHASES.slice(0, lastIdx + 1).filter((p) => !progress.completed[p.id] || targets.includes(p));
@@ -468,7 +500,7 @@ export function openSqlChallenge(challengeId, { onSolved, onCancel } = {}) {
   currentPhase()?.setup?.(engine);
   persist();
   open();
-  ui.log.append(h('div', { class: 'sqlc-sep' }, `— Fase ${PHASES.indexOf(currentPhase()) + 1}: ${currentPhase().title} —`));
+  ui.log.append(h('div', { class: 'sqlc-sep' }, phaseLabel(currentPhase())));
 }
 
 export function openFreePractice({ onClose } = {}) {
@@ -508,6 +540,12 @@ function openReport() {
         h('div', { class: 'sqlr-summary-text' }, h('p', {}, `${done} de ${total} fases logradas.`), h('p', { class: 'sqlr-formula' }, 'Nota = (fases logradas ÷ total) × 10'), ...byKind)),
       h('div', { class: 'sqlr-table-wrap' }, h('table', { class: 'sqlr-table' },
         h('thead', {}, h('tr', {}, ['#', 'Misión', 'Fase', 'Tipo', 'Estado'].map((x) => h('th', { scope: 'col' }, x)))), h('tbody', {}, rows))),
+      h('h3', { class: 'sqlr-bonus-title' }, `⭐ Misiones nerds (bonus): ${BONUS.filter((p) => progress.completed[p.id]).length} de ${BONUS.length} retos`),
+      h('div', { class: 'sqlr-bonus' }, Object.entries(CENTERS).map(([key, c]) => {
+        const all = BONUS.filter((p) => p.center === key);
+        const d = all.filter((p) => progress.completed[p.id]).length;
+        return h('div', { class: `sqlr-bonus-item${d === all.length ? ' done' : ''}` }, h('span', { class: 'sqlr-bonus-icon', 'aria-hidden': 'true' }, c.icon), h('b', {}, c.name), h('small', {}, d === all.length ? '✔ completa' : `${d}/${all.length}`));
+      })),
       h('p', { class: 'shanuki-credit sqlr-credit', html: 'Recurso educativo <span class="sk-logo">SHANUKI</span>' }),
       h('div', { class: 'sqlr-actions sqlr-noprint' },
         h('button', { type: 'button', class: 'sqlc-btn sqlc-btn-primary', onclick: () => window.print() }, '🖨 Imprimir / Guardar PDF'),

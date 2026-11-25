@@ -224,14 +224,15 @@ function lastSelect(ctx) {
 
 function makeQueryCheck(spec) {
   return (ctx) => {
-    const pre = checkDbSelected(ctx.state);
+    const pre = spec.db ? checkBonusDb(ctx.state, spec.db) : checkDbSelected(ctx.state);
     if (pre) return pre;
     const res = lastSelect(ctx);
     if (!res) return no('Esta fase se resuelve con una consulta <b>SELECT</b>. Escribila y ejecutala para ver el resultado.');
     const ref = new SqlEngine(ctx.state);
+    if (spec.db) ref.state.current = ref.state.databases[spec.db].name;
     const [expected] = ref.run(spec.solution);
     if (!expected || expected.kind !== 'rows') {
-      return no('Tu base cambió y ya no tiene la estructura de la misión (¿borraste o renombraste algo en la práctica libre?). Tocá <b>Reparar base</b> y volvé a intentar.');
+      return no(spec.db ? 'Esta base cambió y ya no tiene la estructura del reto. Salí de la terminal y volvé a hablar con el personaje para recargarla.' : 'Tu base cambió y ya no tiene la estructura de la misión (¿borraste o renombraste algo en la práctica libre?). Tocá <b>Reparar base</b> y volvé a intentar.');
     }
     if (expected.rows.length === 0) {
       return no('Tu base no tiene los datos que necesita esta consulta. Tocá <b>Reparar base</b> para recuperarlos.');
@@ -636,9 +637,249 @@ export const MISSIONS = {
   7: 'Informe para la jefa', 8: 'Conexiones', 9: 'El gran golpe',
 };
 
+/* ------------------------------------------------------------------ */
+/* MISIONES NERDS (bonus): no cuentan para la nota                     */
+/* ------------------------------------------------------------------ */
+export const CENTERS = {
+  iti: { name: 'ITI', full: 'Instituto Tecnológico Informático', icon: '🤖', npc: 'Profe Ohm', db: 'iti_robotica' },
+  isbo: { name: 'ISBO', full: 'Instituto Superior Brazo Oriental', icon: '🎮', npc: 'Pixel', db: 'isbo_juegos' },
+  ceibal: { name: 'Ceibal', full: 'Ceibal', icon: '💻', npc: 'Tecla', db: 'ceibal' },
+  esi: { name: 'ESI', full: 'Escuela Superior de Informática', icon: '🖥️', npc: 'Kernel', db: 'esi_servidor' },
+  liceo29: { name: 'Liceo 29', full: 'Liceo 29', icon: '📚', npc: 'Profe Ada', db: 'liceo29_biblio' },
+  inet: { name: 'INET', full: 'Instituto Normal de Enseñanza Técnica', icon: '🔐', npc: 'Profe Bit', db: 'inet_cerraduras' },
+  palacio: { name: 'Palacio', full: 'Palacio Legislativo', icon: '🏛️', npc: 'Delia', db: 'palacio_visitas' },
+};
+
+const BONUS_SEED = {
+  iti_robotica: `CREATE TABLE robot (id INT PRIMARY KEY, nombre VARCHAR(30) NOT NULL, tipo VARCHAR(20), bateria INT);
+INSERT INTO robot VALUES (1,'R2-Mate','explorador',80),(2,'Chispita','soldador',25),(3,'Botón','limpiador',10),(4,'Ceibot','explorador',55);`,
+  isbo_juegos: `CREATE TABLE juego (id INT PRIMARY KEY, titulo VARCHAR(40) NOT NULL, genero VARCHAR(20), puntaje DECIMAL(3,1));
+INSERT INTO juego VALUES (1,'Salto Cuántico','plataformas',8.5),(2,'Laberinto SQL','carreras',9.0),(3,'Pixel Kart','carreras',7.0),(4,'Gato Ninja','plataformas',6.5),(5,'Cubos Lógicos','puzzle',8.0),(6,'Turbo Rambla','carreras',9.5);`,
+  ceibal: `CREATE TABLE escuela (id_escuela INT PRIMARY KEY, nombre VARCHAR(40) NOT NULL, departamento VARCHAR(30));
+CREATE TABLE equipo (serie VARCHAR(10) PRIMARY KEY, modelo VARCHAR(20), estado VARCHAR(15), id_escuela INT, FOREIGN KEY (id_escuela) REFERENCES escuela(id_escuela));
+INSERT INTO escuela VALUES (95,'Escuela 95','Montevideo'),(12,'Escuela 12','Canelones'),(150,'Escuela 150','Maldonado');
+INSERT INTO equipo VALUES ('CB-001','Magallanes','funciona',95),('CB-002','Positivo','roto',95),('CB-003','Magallanes','en reparación',12),('CB-004','Positivo','funciona',12),('CB-005','Magallanes','roto',150),('CB-006','Positivo','funciona',150),('CB-007','Magallanes','funciona',95);`,
+  esi_servidor: '',
+  inet_cerraduras: `CREATE TABLE puerta (id INT PRIMARY KEY, sala VARCHAR(40) NOT NULL, estado VARCHAR(10), docentes_adentro INT);
+INSERT INTO puerta VALUES (1,'Aula de Programación','abierta',3),(2,'Laboratorio de Robótica','abierta',2),(3,'Sala de Profes','abierta',4),(4,'Biblioteca','abierta',1),(5,'Puerta principal','abierta',1);`,
+  palacio_visitas: `CREATE TABLE visita (id INT PRIMARY KEY, centro VARCHAR(40) NOT NULL, departamento VARCHAR(30), estudiantes INT, fecha DATE);
+INSERT INTO visita VALUES (1,'ITI','Montevideo',28,'2027-03-15'),(2,'Liceo de Tala','Canelones',35,'2027-04-02'),(3,'ISBO','Montevideo',30,'2027-05-10'),(4,'UTU de Rocha','Rocha',22,'2027-06-21'),(5,'Liceo 1 de Pando','Canelones',40,'2027-08-08');`,
+  liceo29_biblio: `CREATE TABLE libro (id INT PRIMARY KEY, titulo VARCHAR(50) NOT NULL, autor VARCHAR(40), anio INT, prestado INT DEFAULT 0);
+INSERT INTO libro VALUES (1,'Yo, robot','Isaac Asimov',1950,0),(2,'Fundación','Isaac Asimov',1951,1),(3,'Neuromante','William Gibson',1984,0),(4,'El juego de Ender','Orson Scott Card',1985,0),(5,'Frankenstein','Mary Shelley',1818,1),(6,'Crónicas marcianas','Ray Bradbury',1950,0),(7,'El fin de la eternidad','Isaac Asimov',1955,0);`,
+};
+
+function checkBonusDb(state, db) {
+  if (!state.databases[db]) return no(`No encuentro la base <b>${db}</b>. Salí de la terminal y volvé a hablar con el personaje para recargarla.`);
+  if (lc(state.current) !== db) return no(`Estás usando otra base. Este reto es sobre <b>${db}</b>: escribí <code>USE ${db};</code>`);
+  return null;
+}
+
+/** Crea la base temática del centro si no existe y la deja en uso. */
+export function seedBonus(engine, center) {
+  const db = CENTERS[center].db;
+  const prev = engine.state.current;
+  if (!engine.state.databases[db]) {
+    engine.run(`CREATE DATABASE ${db}; USE ${db}; ${BONUS_SEED[db]}`);
+  }
+  engine.state.current = engine.state.databases[db].name;
+  return prev;
+}
+
+function bonusTableCheck(state, db, spec) {
+  const pre = checkBonusDb(state, db); if (pre) return pre;
+  const t = getTable(state, db, spec.name);
+  if (!t) return no(`Todavía no existe la tabla <b>${spec.name}</b> en <b>${db}</b>.`);
+  for (const c of spec.cols) {
+    const col = getColumn(t, c.name);
+    if (!col) return no(`A la tabla <b>${spec.name}</b> le falta la columna <b>${c.name}</b>.`);
+    if (!c.cats.includes(typeCategory(col.type))) return no(`La columna <b>${c.name}</b> tiene un tipo que no sirve: debería guardar ${c.cats.map((x) => CAT_LABEL[x]).join(' o ')}.`);
+    if (c.notNull && !col.notNull && !t.pk.map(lc).includes(lc(c.name))) return no(`La columna <b>${c.name}</b> tiene que ser obligatoria. ¿Qué restricción impide los valores nulos?`);
+    if (c.unique && !t.uniques.some((u) => u.cols.length === 1 && lc(u.cols[0]) === lc(c.name)) && !(t.pk.length === 1 && lc(t.pk[0]) === lc(c.name))) return no(`En <b>${c.name}</b> no se pueden repetir valores (dos personas con el mismo usuario). ¿Qué restricción lo asegura, sin que sea la clave primaria?`);
+    if (c.default !== undefined && (!col.hasDefault || norm(col.default) !== norm(c.default))) return no(`La columna <b>${c.name}</b> tiene que tener el valor por defecto <b>'${c.default}'</b>. ¿Qué palabra le da un valor automático?`);
+  }
+  if (spec.pk) {
+    if (t.pk.map(lc).join(',') !== spec.pk.map(lc).join(',')) return no(`La clave primaria de <b>${spec.name}</b> tiene que ser <b>${spec.pk.join(', ')}</b>.`);
+  }
+  return null;
+}
+
+function bonusRowCheck(state, db, table, keyCol, keyVal, expected, label) {
+  const pre = checkBonusDb(state, db); if (pre) return pre;
+  const t = getTable(state, db, table);
+  if (!t) return no(`No encuentro la tabla <b>${table}</b>. Salí y volvé a hablar con el personaje para recargar la base.`);
+  const ki = t.columns.findIndex((c) => lc(c.name) === lc(keyCol));
+  const row = t.rows.find((r) => norm(r[ki]) === norm(keyVal));
+  if (!row) return no(`No encuentro ${label} en la tabla <b>${table}</b>.`);
+  for (const [col, val] of Object.entries(expected)) {
+    const i = t.columns.findIndex((c) => lc(c.name) === lc(col));
+    if (i === -1 || norm(row[i]) !== norm(val)) return no(`En ${label}, el dato <b>${col}</b> no es el pedido. Revisalo.`);
+  }
+  return null;
+}
+
+export const BONUS = [
+  {
+    id: 'nerd-iti-1', center: 'iti', db: 'iti_robotica', kind: 'DML', title: 'Nuevo robot del club',
+    consigna: `<p>El club de robótica del ITI armó un robot nuevo y hay que registrarlo.</p>
+      <p class="sqlc-goal">🎯 <b>Objetivo:</b> insertá en la tabla <code>robot</code> este robot:</p>
+      <div class="sqlc-dossier"><div class="sqlc-dossier-title">🤖 Ficha</div><table><thead><tr><th>id</th><th>nombre</th><th>tipo</th><th>bateria</th></tr></thead><tbody><tr><td>5</td><td>Bytebot</td><td>programador</td><td>100</td></tr></tbody></table></div>
+      <p class="sqlc-tip">Mirá la tabla antes con <code>SELECT * FROM robot;</code></p>`,
+    solution: "INSERT INTO robot VALUES (5, 'Bytebot', 'programador', 100);",
+    check: ({ state }) => bonusRowCheck(state, 'iti_robotica', 'robot', 'id', 5, { nombre: 'Bytebot', tipo: 'programador', bateria: 100 }, 'el robot <b>5</b>') || ok(),
+  },
+  {
+    id: 'nerd-iti-2', center: 'iti', db: 'iti_robotica', kind: 'DQL', title: 'Robots sin batería',
+    consigna: `<p>Antes de la competencia hay que cargar a los robots con poca batería.</p>
+      <p class="sqlc-goal">🎯 <b>Objetivo:</b> mostrá el <b>nombre</b> y la <b>batería</b> de los robots con batería <b>menor a 30</b>, ordenados de <b>menor a mayor</b> batería.</p>`,
+    solution: 'SELECT nombre, bateria FROM robot WHERE bateria < 30 ORDER BY bateria;',
+    ordered: true, colLabels: ['nombre', 'bateria'],
+  },
+  {
+    id: 'nerd-isbo-1', center: 'isbo', db: 'isbo_juegos', kind: 'DQL', title: 'Promedio por género',
+    consigna: `<p>En el ISBO se hacen videojuegos. Pixel quiere saber qué género gusta más.</p>
+      <p class="sqlc-goal">🎯 <b>Objetivo:</b> mostrá cada <b>género</b> con el <b>promedio de puntaje</b> de sus juegos.</p>
+      <p class="sqlc-tip">Promedio = <code>AVG</code>. Una fila por género.</p>`,
+    solution: 'SELECT genero, AVG(puntaje) AS promedio FROM juego GROUP BY genero;',
+    colLabels: ['genero', 'promedio'],
+    hints: { fewer: 'Te salió una sola fila: promediaste todos los juegos juntos. ¿Qué cláusula arma un grupo por cada género?' },
+  },
+  {
+    id: 'nerd-isbo-2', center: 'isbo', db: 'isbo_juegos', kind: 'DML', title: 'Género equivocado',
+    consigna: `<p>¡Error en la base! <b>Laberinto SQL</b> no es un juego de carreras.</p>
+      <p class="sqlc-goal">🎯 <b>Objetivo:</b> cambiá el género del juego <b>Laberinto SQL</b> a <b>puzzle</b>. Los demás juegos no cambian.</p>`,
+    solution: "UPDATE juego SET genero = 'puzzle' WHERE titulo = 'Laberinto SQL';",
+    check: ({ state }) => {
+      const t = getTable(state, 'isbo_juegos', 'juego');
+      if (t) {
+        const gi = t.columns.findIndex((c) => lc(c.name) === 'genero');
+        if (t.rows.filter((r) => lc(r[gi]) === 'puzzle').length > 2) return no('Hay demasiados juegos de <b>puzzle</b>: ¿tu UPDATE tiene WHERE? Salí y volvé a hablar con Pixel para recargar la base.');
+      }
+      return bonusRowCheck(state, 'isbo_juegos', 'juego', 'id', 2, { genero: 'puzzle' }, 'el juego <b>Laberinto SQL</b>') || ok();
+    },
+  },
+  {
+    id: 'nerd-ceibal-1', center: 'ceibal', db: 'ceibal', kind: 'DQL', title: 'Equipos por estado',
+    consigna: `<p>En Ceibal llevan el control de las computadoras de cada escuela.</p>
+      <p class="sqlc-goal">🎯 <b>Objetivo:</b> contá cuántos equipos hay en cada <b>estado</b> (funciona, roto, en reparación). Mostrá el estado y la cantidad.</p>`,
+    solution: 'SELECT estado, COUNT(*) AS cantidad FROM equipo GROUP BY estado;',
+    colLabels: ['estado', 'cantidad'],
+  },
+  {
+    id: 'nerd-ceibal-2', center: 'ceibal', db: 'ceibal', kind: 'DQL', title: 'Equipos rotos y su escuela',
+    consigna: `<p>El equipo técnico va a salir a reparar.</p>
+      <p class="sqlc-goal">🎯 <b>Objetivo:</b> mostrá la <b>serie</b> y el <b>modelo</b> de los equipos con estado <b>'roto'</b>, junto al <b>nombre de su escuela</b>.</p>
+      <p class="sqlc-tip">El nombre de la escuela está en otra tabla.</p>`,
+    solution: "SELECT e.serie, e.modelo, s.nombre FROM equipo e JOIN escuela s ON e.id_escuela = s.id_escuela WHERE e.estado = 'roto';",
+    colLabels: ['serie', 'modelo', 'nombre de la escuela'],
+  },
+  {
+    id: 'nerd-esi-1', center: 'esi', db: 'esi_servidor', kind: 'DDL', title: 'Tabla de usuarios',
+    consigna: `<p>Kernel está armando el servidor de la ESI y necesita guardar a los usuarios.</p>
+      <p class="sqlc-goal">🎯 <b>Objetivo:</b> creá la tabla <code>usuario</code> en la base <code>esi_servidor</code>:</p>
+      <ul><li><code>id</code> → número entero, <b>clave primaria</b></li>
+      <li><code>nombre_usuario</code> → texto (hasta 30), <b>obligatorio</b> y <b>sin repetirse</b> (<code>UNIQUE</code>)</li>
+      <li><code>email</code> → texto (hasta 80)</li></ul>`,
+    solution: 'CREATE TABLE usuario (\n  id INT PRIMARY KEY,\n  nombre_usuario VARCHAR(30) NOT NULL UNIQUE,\n  email VARCHAR(80)\n);',
+    check: ({ state }) => bonusTableCheck(state, 'esi_servidor', { name: 'usuario', pk: ['id'], cols: [{ name: 'id', cats: ['int'] }, { name: 'nombre_usuario', cats: ['text'], notNull: true, unique: true }, { name: 'email', cats: ['text'] }] }) || ok(),
+  },
+  {
+    id: 'nerd-esi-2', center: 'esi', db: 'esi_servidor', kind: 'DDL', title: 'Rol por defecto',
+    consigna: `<p>Cada usuario nuevo del servidor arranca como <b>alumno</b>.</p>
+      <p class="sqlc-goal">🎯 <b>Objetivo:</b> agregá a <code>usuario</code> la columna <code>rol</code> (texto, hasta 20) con el valor por defecto <b>'alumno'</b>.</p>
+      <p class="sqlc-tip">Probalo: insertá un usuario sin rol y mirá qué valor toma.</p>`,
+    setup: (engine) => {
+      if (engine.state.databases.esi_servidor && !getTable(engine.state, 'esi_servidor', 'usuario')) {
+        engine.run('USE esi_servidor; ' + BONUS[6].solution);
+      }
+    },
+    solution: "ALTER TABLE usuario ADD rol VARCHAR(20) DEFAULT 'alumno';",
+    check: ({ state }) => bonusTableCheck(state, 'esi_servidor', { name: 'usuario', cols: [{ name: 'rol', cats: ['text'], default: 'alumno' }] }) || ok(),
+  },
+  {
+    id: 'nerd-liceo29-1', center: 'liceo29', db: 'liceo29_biblio', kind: 'DQL', title: 'Libros de Asimov',
+    consigna: `<p>La biblioteca del Liceo 29 tiene un estante de ciencia ficción.</p>
+      <p class="sqlc-goal">🎯 <b>Objetivo:</b> mostrá el <b>título</b> de los libros cuyo autor contiene la palabra <b>Asimov</b>.</p>
+      <p class="sqlc-tip">Para buscar "una parte" de un texto se usa <code>LIKE</code> con <code>%</code>.</p>`,
+    solution: "SELECT titulo FROM libro WHERE autor LIKE '%Asimov%';",
+    colLabels: ['titulo'],
+    hints: { empty: 'No salió ningún libro. Si usás <code>=</code>, el texto tiene que ser idéntico. ¿Qué operador busca una parte del texto?' },
+  },
+  {
+    id: 'nerd-liceo29-2', center: 'liceo29', db: 'liceo29_biblio', kind: 'DML', title: 'Préstamo de Neuromante',
+    consigna: `<p>Un estudiante de 3.º se lleva <b>Neuromante</b>.</p>
+      <p class="sqlc-goal">🎯 <b>Objetivo:</b> marcá el libro <b>Neuromante</b> como prestado (<code>prestado = 1</code>). Los otros libros no cambian.</p>`,
+    solution: "UPDATE libro SET prestado = 1 WHERE titulo = 'Neuromante';",
+    check: ({ state }) => {
+      const t = getTable(state, 'liceo29_biblio', 'libro');
+      if (t) {
+        const pi = t.columns.findIndex((c) => lc(c.name) === 'prestado');
+        if (t.rows.filter((r) => norm(r[pi]) === '1').length > 3) return no('Quedaron prestados libros de más: ¿tu UPDATE tiene WHERE? Salí y volvé a hablar con la Profe Ada para recargar la base.');
+      }
+      return bonusRowCheck(state, 'liceo29_biblio', 'libro', 'id', 3, { prestado: 1 }, 'el libro <b>Neuromante</b>') || ok();
+    },
+  },
+  {
+    id: 'nerd-inet-1', center: 'inet', db: 'inet_cerraduras', kind: 'DML', title: 'Operación: sin clases',
+    consigna: `<p>El INET tiene cerraduras electrónicas manejadas por una base de datos. Plan maestro: <b>cerrar todas las puertas</b> con los docentes adentro… ¡y se terminaron las clases! 😈</p>
+      <p class="sqlc-goal">🎯 <b>Objetivo:</b> cambiá el <code>estado</code> de <b>todas</b> las puertas de la tabla <code>puerta</code> a <b>'cerrada'</b>.</p>
+      <p class="sqlc-tip">🤫 Por única vez en todo el juego, un UPDATE <b>sin WHERE</b> es justo lo que necesitás.</p>`,
+    solution: "UPDATE puerta SET estado = 'cerrada';",
+    check: ({ state }) => {
+      const pre = checkBonusDb(state, 'inet_cerraduras'); if (pre) return pre;
+      const t = getTable(state, 'inet_cerraduras', 'puerta');
+      if (!t) return no('No encuentro la tabla <b>puerta</b>. Salí y volvé a hablar con el Profe Bit para recargar la base.');
+      const ei = t.columns.findIndex((c) => lc(c.name) === 'estado');
+      const open = t.rows.filter((r) => lc(r[ei]) !== 'cerrada');
+      if (open.length) return no(`Todavía ${open.length === 1 ? 'queda 1 puerta abierta' : `quedan ${open.length} puertas abiertas`}. ¿Tu UPDATE tiene un WHERE que deja afuera algunas? Esta vez tienen que ser <b>todas</b>.`);
+      return ok();
+    },
+  },
+  {
+    id: 'nerd-inet-2', center: 'inet', db: 'inet_cerraduras', kind: 'DQL', title: '¿Cuántos quedaron adentro?',
+    consigna: `<p>Puertas cerradas. Ahora, el informe para festejar.</p>
+      <p class="sqlc-goal">🎯 <b>Objetivo:</b> calculá cuántos docentes quedaron encerrados en total: la <b>suma</b> de <code>docentes_adentro</code> de todas las puertas cerradas.</p>`,
+    setup: (engine) => {
+      const t = getTable(engine.state, 'inet_cerraduras', 'puerta');
+      if (t) { const ei = t.columns.findIndex((c) => lc(c.name) === 'estado'); t.rows.forEach((r) => { r[ei] = 'cerrada'; }); }
+    },
+    solution: "SELECT SUM(docentes_adentro) AS encerrados FROM puerta WHERE estado = 'cerrada';",
+    colLabels: ['total de docentes encerrados'],
+    hints: { more: 'Te salió una fila por puerta. ¿Qué función suma todos los valores en uno solo?' },
+  },
+  {
+    id: 'nerd-palacio-1', center: 'palacio', db: 'palacio_visitas', kind: 'DML', title: 'Registrar la visita',
+    consigna: `<p>Hoy llegó de visita un grupo del <b>Liceo 29</b> al Palacio Legislativo.</p>
+      <p class="sqlc-goal">🎯 <b>Objetivo:</b> insertá esta visita en la tabla <code>visita</code>:</p>
+      <div class="sqlc-dossier"><div class="sqlc-dossier-title">🏛️ Registro de visitas</div><table><thead><tr><th>id</th><th>centro</th><th>departamento</th><th>estudiantes</th><th>fecha</th></tr></thead><tbody><tr><td>6</td><td>Liceo 29</td><td>Montevideo</td><td>32</td><td>2027-11-20</td></tr></tbody></table></div>
+      <p class="sqlc-tip">La fecha va entre comillas: <code>'AAAA-MM-DD'</code>.</p>`,
+    solution: "INSERT INTO visita VALUES (6, 'Liceo 29', 'Montevideo', 32, '2027-11-20');",
+    check: ({ state }) => bonusRowCheck(state, 'palacio_visitas', 'visita', 'id', 6, { centro: 'Liceo 29', departamento: 'Montevideo', estudiantes: 32, fecha: '2027-11-20' }, 'la visita <b>6</b>') || ok(),
+  },
+  {
+    id: 'nerd-palacio-2', center: 'palacio', db: 'palacio_visitas', kind: 'DQL', title: 'Estudiantes por departamento',
+    consigna: `<p>El Palacio quiere saber de dónde vienen sus visitantes.</p>
+      <p class="sqlc-goal">🎯 <b>Objetivo:</b> mostrá cada <b>departamento</b> con el <b>total de estudiantes</b> que visitaron el Palacio desde ahí.</p>
+      <p class="sqlc-tip">Total = <code>SUM</code>. Una fila por departamento.</p>`,
+    setup: (engine) => {
+      const t = getTable(engine.state, 'palacio_visitas', 'visita');
+      if (t && !t.rows.some((r) => norm(r[0]) === '6')) {
+        const prev = engine.state.current;
+        engine.run('USE palacio_visitas; ' + BONUS.find((b) => b.id === 'nerd-palacio-1').solution);
+        engine.state.current = prev;
+      }
+    },
+    solution: 'SELECT departamento, SUM(estudiantes) AS total FROM visita GROUP BY departamento;',
+    colLabels: ['departamento', 'total de estudiantes'],
+    hints: { fewer: 'Te salió una sola fila: sumaste todo junto. ¿Qué cláusula arma un grupo por departamento?', more: 'Salen filas de más: ¿estás mostrando cada visita por separado? Agrupá por departamento y sumá.' },
+  },
+];
+for (const p of BONUS) { p.bonus = true; if (!p.check) p.check = makeQueryCheck(p); }
+
 /** Mapea el id de reto de la historia (- SQL: id) a fases. Un id de misión ("mision-3") abre todas sus fases. */
 export function phasesFor(challengeId) {
   const id = String(challengeId).trim().toLowerCase();
+  const nerd = id.match(/^nerd-([a-z0-9]+)$/);
+  if (nerd) return BONUS.filter((p) => p.center === nerd[1]);
   const m = id.match(/^mision-(\d+)$/);
   if (m) return PHASES.filter((p) => p.mission === Number(m[1]));
   return PHASES.filter((p) => p.id === id);

@@ -43,7 +43,7 @@ test('todas las misiones parsean y cada SQL: apunta a fases existentes', async (
       if (st.challengeId !== 'libre') { assert.ok(phasesFor(st.challengeId).length > 0, `${f}: ${st.challengeId}`); used.add(st.challengeId); }
     }
   }
-  assert.equal(used.size, 9);
+  assert.equal(used.size, 16);
 });
 
 // Variantes correctas (otra forma de escribir) y errores típicos por fase
@@ -101,4 +101,40 @@ test('variantes correctas pasan y errores típicos no pasan (sin mostrar la solu
     }
     engine.run(p.solution);
   }
+});
+
+test('misiones nerds: cada reto falla antes, pasa con la solución y no cambia la nota', async () => {
+  const { BONUS, CENTERS, seedBonus } = await import('../src/sql/challenges.js');
+  const engine = new SqlEngine();
+  engine.run('CREATE DATABASE bajo_mundo; USE bajo_mundo;');
+  for (const center of Object.keys(CENTERS)) {
+    const prev = seedBonus(engine, center);
+    assert.equal(prev, 'bajo_mundo');
+    for (const p of BONUS.filter((b) => b.center === center)) {
+      p.setup?.(engine);
+      assert.equal(p.check({ engine, state: engine.state, lastResults: [] }).ok, false, `${p.id} no debería pasar antes`);
+      const results = engine.run(p.solution);
+      assert.deepEqual(results.filter((r) => r.kind === 'error').map((r) => r.error.toMysql()), [], p.id);
+      const v = p.check({ engine, state: engine.state, lastResults: results });
+      assert.equal(v.ok, true, `${p.id}: ${v.msg}`);
+    }
+    engine.state.current = prev;
+  }
+  // variantes y errores típicos
+  const e2 = new SqlEngine(); seedBonus(e2, 'iti');
+  const iti2 = BONUS.find((b) => b.id === 'nerd-iti-2');
+  let r = e2.run('SELECT nombre, bateria FROM robot WHERE bateria < 30');
+  assert.equal(iti2.check({ state: e2.state, lastResults: r }).ok, false, 'sin ORDER BY no pasa');
+  r = e2.run('select bateria, nombre from robot where bateria <= 29 order by 1 asc');
+  assert.equal(iti2.check({ state: e2.state, lastResults: r }).ok, true);
+  const e3 = new SqlEngine(); seedBonus(e3, 'liceo29');
+  const l1 = BONUS.find((b) => b.id === 'nerd-liceo29-1');
+  r = e3.run("SELECT titulo FROM libro WHERE autor = 'Asimov'");
+  assert.equal(l1.check({ state: e3.state, lastResults: r }).ok, false);
+  r = e3.run("SELECT * FROM libro WHERE autor LIKE '%asimov'");
+  assert.equal(l1.check({ state: e3.state, lastResults: r }).ok, true);
+  const e4 = new SqlEngine(); seedBonus(e4, 'esi');
+  const s1 = BONUS.find((b) => b.id === 'nerd-esi-1');
+  r = e4.run('CREATE TABLE usuario (id INT PRIMARY KEY, nombre_usuario VARCHAR(30) NOT NULL, email VARCHAR(80))');
+  assert.equal(s1.check({ state: e4.state, lastResults: r }).ok, false, 'sin UNIQUE no pasa');
 });
