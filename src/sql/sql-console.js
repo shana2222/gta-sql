@@ -61,7 +61,6 @@ function mount(el) {
 if (typeof document !== 'undefined') {
   document.addEventListener('fullscreenchange', () => {
     for (const id of ['sqlc-root', 'sqlr-root', 'sqlc-toast']) { const el = document.getElementById(id); if (el) mount(el); }
-    if (fab) mount(fab);
   });
 }
 
@@ -159,16 +158,23 @@ function buildUi() {
 let fab = null;
 function buildFab() {
   if (fab || typeof document === 'undefined') return;
-  fab = h('button', { type: 'button', class: 'sqlc-fab', title: 'Abrir la terminal SQL (práctica libre y reporte)', 'aria-label': 'Abrir terminal SQL', onclick: () => openFreePractice() });
+  const quick = document.querySelector('#hud-layer .hud-quick-actions');
+  if (!quick) { setTimeout(buildFab, 300); return; }
+  // Botón dentro del HUD (junto a Menú y Objetos): se oculta con el HUD y no tapa otras pantallas
+  fab = h('button', { type: 'button', id: 'sql-hud-button', class: 'hud-pill pause-button sqlc-hud-btn', title: 'Terminal SQL: práctica libre y reporte de nota', 'aria-label': 'Abrir terminal SQL', onclick: () => openFreePractice() });
   fab.addEventListener('keydown', (e) => e.stopPropagation());
-  mount(fab);
+  fab.addEventListener('pointerdown', (e) => e.stopPropagation());
+  quick.append(fab);
   refreshChips();
 }
 
 function refreshChips() {
   const { grade, done, total } = getGrade();
   const txt = `Nota ${grade.toFixed(1)}`;
-  if (fab) fab.innerHTML = `<span aria-hidden="true">▣</span> SQL · ${txt}`;
+  if (fab) {
+    fab.innerHTML = `<svg class="sqlc-hud-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><ellipse cx="12" cy="5.5" rx="7" ry="2.8"/><path d="M5 5.5v13c0 1.5 3.1 2.8 7 2.8s7-1.3 7-2.8v-13"/><path d="M5 12c0 1.5 3.1 2.8 7 2.8s7-1.3 7-2.8"/></svg><span class="sqlc-hud-label">SQL</span><span class="sqlc-hud-grade">${grade.toFixed(1)}</span>`;
+    fab.setAttribute('aria-label', `Abrir terminal SQL. ${txt}, ${done} de ${total} fases`);
+  }
   if (ui) {
     ui.gradeChip.textContent = `📊 ${txt} · ${done}/${total}`;
   }
@@ -409,7 +415,6 @@ function open() {
   u.root.hidden = false;
   document.documentElement.classList.add('sqlc-open');
   window.__sqlConsoleOpen = true;
-  if (fab) fab.hidden = true;
   refreshChips();
   renderLeft();
   renderSchema();
@@ -429,7 +434,6 @@ function close(solved) {
   ui.root.hidden = true;
   document.documentElement.classList.remove('sqlc-open');
   session = null;
-  if (fab) fab.hidden = false;
   // dejamos pasar un frame para que la tecla de acción no avance la escena
   setTimeout(() => { window.__sqlConsoleOpen = false; }, 120);
   if (s?.mode === 'free') s.onClose?.();

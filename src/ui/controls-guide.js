@@ -17,7 +17,7 @@ function html() {
       </ul>
       <ul class="cg-touch">
         ${row('<span class="cg-stick" aria-hidden="true"></span>', '👣', 'Mové el joystick para caminar')}
-        ${row('<span class="cg-btn">A</span>', '🚗', 'Botón de acción: subir, hablar, entrar')}
+        ${row('<span class="cg-btn">✋</span>', '🚗', 'Botón de acción: subir al auto, hablar, entrar')}
       </ul>
     </section>
     <section class="cg-card cg-car" data-mode="car">
@@ -29,8 +29,10 @@ function html() {
         ${row(k('Espacio') + '<b>+</b>' + k('Shift'), '🚪', 'Bajarte del auto')}
       </ul>
       <ul class="cg-touch">
-        ${row('<span class="cg-wheel" aria-hidden="true">⟲⟳</span>', '↩️', 'Deslizá el dedo para doblar')}
-        ${row('<span class="cg-btn">A</span><span class="cg-btn b">B</span>', '⏩', 'A acelera · B frena / marcha atrás')}
+        ${row('<span class="cg-wheel" aria-hidden="true">⟲⟳</span>', '↩️', 'Deslizá el dedo a los costados para doblar')}
+        ${row('<span class="cg-btn">✋</span>', '⏩', 'Botón de acción: acelerar')}
+        ${row('<span class="cg-btn b">🛑</span>', '⏪', 'Frenar · marcha atrás')}
+        ${row('<span class="cg-btn exit">🚪</span>', '🚶', 'Bajarte del auto')}
       </ul>
     </section>
     <section class="cg-card cg-all">
@@ -45,7 +47,11 @@ function html() {
   </div>`;
 }
 
-function readOpen() { try { return localStorage.getItem(KEY_OPEN) !== '0'; } catch { return true; } }
+const isTouch = () => Boolean(window.matchMedia?.('(pointer: coarse)').matches);
+function readOpen() {
+  if (isTouch()) return false; // en celular/tablet arranca plegado para no tapar el joystick
+  try { return localStorage.getItem(KEY_OPEN) !== '0'; } catch { return true; }
+}
 function saveOpen(v) { try { localStorage.setItem(KEY_OPEN, v ? '1' : '0'); } catch { /* sin almacenamiento */ } }
 
 function mount() {
@@ -63,10 +69,14 @@ function mount() {
   const setOpen = (open) => {
     el.classList.toggle('closed', !open);
     toggle.setAttribute('aria-expanded', String(open));
-    saveOpen(open);
+    if (!isTouch()) saveOpen(open);
   };
   setOpen(readOpen());
   toggle.addEventListener('click', () => setOpen(el.classList.contains('closed')));
+  // en pantallas táctiles se pliega solo al tocar fuera del panel (para jugar)
+  document.addEventListener('pointerdown', (e) => {
+    if (isTouch() && !el.contains(e.target) && !el.classList.contains('closed')) setOpen(false);
+  }, true);
 
   const status = document.getElementById('vehicle-status');
   const sync = () => {
