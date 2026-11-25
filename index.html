@@ -8,6 +8,7 @@
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="GTA">
+  <meta name="author" content="Shana — SHANUKI">
   <meta name="description" content="Práctica de SQL (DDL, DML y DQL) en forma de juego: manejá por Santa Bruma y armá la base de datos clandestina de la Familia Ceibo.">
   <meta property="og:type" content="website">
   <meta property="og:title" content="GTA SQL — Bajo Mundo de Datos">
@@ -23,7 +24,7 @@
   <link rel="apple-touch-icon" sizes="180x180" href="./icon-180.png">
   <title>GTA SQL — Bajo Mundo de Datos</title>
   <link rel="stylesheet" href="./styles/main.css?v=42">
-  <link rel="stylesheet" href="./styles/sql-console.css?v=3">
+  <link rel="stylesheet" href="./styles/sql-console.css?v=4">
   <link rel="stylesheet" href="./styles/controls-guide.css?v=1">
 </head>
 <body>
@@ -167,6 +168,7 @@
           <button id="start-button" type="button" class="primary-button" disabled>Cargando...</button>
           <button id="new-game-button" type="button" class="secondary-button hidden" disabled>Nuevo juego</button>
         </div>
+        <p class="shanuki-credit" aria-label="Recurso SHANUKI, por Shana"><span class="sk-logo">SHANUKI</span><span class="sk-sep" aria-hidden="true">·</span><span class="sk-by">por Shana</span></p>
         <p id="ios-install-hint" class="ios-install-hint hidden">En iPhone, para pantalla completa sin barra: Compartir → Agregar a pantalla de inicio.</p>
       </div>
     </section>
@@ -244,6 +246,7 @@
           <button id="pause-reset-game-btn" type="button" class="secondary-button">REINICIAR TODO EL JUEGO</button>
           <button id="pause-exit-btn" type="button" class="danger-button">SALIR</button>
         </div>
+        <p class="shanuki-credit small" aria-label="Recurso SHANUKI, por Shana"><span class="sk-logo">SHANUKI</span><span class="sk-sep" aria-hidden="true">·</span><span class="sk-by">por Shana</span></p>
       </div>
     </section>
 
@@ -387,7 +390,7 @@
     })();
   </script>
   <script type="module" src="./src/main.js?v=79"></script>
-  <script type="module" src="./src/sql/sql-console.js?v=2"></script>
+  <script type="module" src="./src/sql/sql-console.js?v=3"></script>
   <script type="module" src="./src/ui/controls-guide.js?v=1"></script>
 </body>
 </html>

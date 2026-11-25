@@ -108,7 +108,8 @@ function buildUi() {
   const feedback = h('div', { class: 'sqlc-feedback', role: 'status', 'aria-live': 'polite' });
   const nextBtn = h('button', { type: 'button', class: 'sqlc-btn sqlc-btn-success', hidden: true, onclick: () => goNext() }, 'Continuar ▶');
   const guide = h('section', { class: 'sqlc-guide', 'aria-label': 'Instructivo de comandos SQL' });
-  const left = h('section', { class: 'sqlc-left', 'aria-label': 'Consigna' }, steps, consigna, feedback, nextBtn, guide);
+  const credit = h('p', { class: 'shanuki-credit small', 'aria-label': 'Recurso SHANUKI, por Shana', html: '<span class="sk-logo">SHANUKI</span><span class="sk-sep" aria-hidden="true">·</span><span class="sk-by">por Shana</span>' });
+  const left = h('section', { class: 'sqlc-left', 'aria-label': 'Consigna' }, steps, consigna, feedback, nextBtn, guide, credit);
 
   const log = h('div', { class: 'sqlc-log', 'aria-live': 'polite', 'aria-label': 'Resultados' });
   const editor = h('textarea', {
@@ -503,6 +504,7 @@ function openReport() {
         h('div', { class: 'sqlr-summary-text' }, h('p', {}, `${done} de ${total} fases logradas.`), h('p', { class: 'sqlr-formula' }, 'Nota = (fases logradas ÷ total) × 10'), ...byKind)),
       h('div', { class: 'sqlr-table-wrap' }, h('table', { class: 'sqlr-table' },
         h('thead', {}, h('tr', {}, ['#', 'Misión', 'Fase', 'Tipo', 'Estado'].map((x) => h('th', { scope: 'col' }, x)))), h('tbody', {}, rows))),
+      h('p', { class: 'shanuki-credit sqlr-credit', html: 'Recurso educativo <span class="sk-logo">SHANUKI</span><span class="sk-sep" aria-hidden="true">·</span><span class="sk-by">por Shana</span>' }),
       h('div', { class: 'sqlr-actions sqlr-noprint' },
         h('button', { type: 'button', class: 'sqlc-btn sqlc-btn-primary', onclick: () => window.print() }, '🖨 Imprimir / Guardar PDF'),
         h('button', { type: 'button', class: 'sqlc-btn sqlc-btn-danger', onclick: () => resetAll() }, 'Borrar mi progreso SQL'))));

@@ -308,3 +308,23 @@
 .g-tips { margin: 8px 0 0; padding-left: 20px; font-size: 14px; }
 .g-tips li { margin-bottom: 3px; }
 @media (max-width: 820px) { .g-rel { flex-wrap: wrap; } .g-compare { grid-template-columns: 1fr; } }
+
+/* =================== Referencia SHANUKI =================== */
+.shanuki-credit { display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 8px; margin: 14px 0 0; font: 600 14px/1.2 system-ui, -apple-system, "Segoe UI", sans-serif; color: rgba(230, 237, 243, 0.85); letter-spacing: 0.04em; }
+.shanuki-credit .sk-logo {
+  font-family: "Orbitron", "Arial Black", system-ui, sans-serif; font-weight: 900; letter-spacing: 0.18em; font-size: 1.05em;
+  color: rgb(0, 240, 255); text-shadow: 0 0 6px rgba(0, 240, 255, 0.85), 0 0 14px rgba(255, 0, 200, 0.55);
+  padding: 2px 10px; border: 1px solid rgba(0, 240, 255, 0.7); border-radius: 6px; background: rgba(10, 6, 30, 0.75);
+  box-shadow: 0 0 10px rgba(0, 240, 255, 0.35), inset 0 0 8px rgba(255, 0, 200, 0.25);
+}
+.shanuki-credit .sk-sep { color: rgb(255, 0, 200); font-weight: 900; }
+.shanuki-credit .sk-by { color: rgb(255, 255, 255); text-shadow: 0 0 6px rgba(255, 0, 200, 0.6); }
+.shanuki-credit.small { font-size: 12px; margin-top: 12px; }
+.sqlc-left .shanuki-credit { justify-content: flex-start; color: var(--c-muted); }
+.sqlc-left .shanuki-credit .sk-by { color: var(--c-text); text-shadow: none; }
+.sqlr-credit { justify-content: flex-start; color: var(--c-muted); margin-top: 14px; }
+.sqlr-credit .sk-by { color: var(--c-text); text-shadow: none; }
+@media print {
+  .shanuki-credit .sk-logo { color: rgb(0, 0, 0) !important; text-shadow: none !important; box-shadow: none !important; background: rgb(255, 255, 255) !important; border-color: rgb(0, 0, 0) !important; }
+  .shanuki-credit .sk-sep, .shanuki-credit .sk-by { color: rgb(0, 0, 0) !important; text-shadow: none !important; }
+}
