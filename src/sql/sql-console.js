@@ -2,6 +2,7 @@
 import { SqlEngine, splitStatements } from './sql-engine.js';
 import { PHASES, MISSIONS, DB_NAME, phasesFor, rebuildState, BONUS, CENTERS, seedBonus } from './challenges.js';
 import { renderGuide } from './guide.js';
+import { downloadProgressPdf } from './pdf-report.js';
 
 const KEY_DB = 'gtasql.db.v1';
 const KEY_PROGRESS = 'gtasql.progress.v1';
@@ -556,6 +557,42 @@ function openReport() {
       h('td', {}, String(i + 1)), h('td', {}, `${p.mission}. ${MISSIONS[p.mission]}`), h('td', {}, p.title), h('td', {}, p.kind),
       h('td', {}, doneAt ? '✔ Lograda' : '— Pendiente'));
   });
+  const pdfMsg = h('p', { class: 'sqlr-pdf-msg', role: 'status', 'aria-live': 'polite' });
+  const entregasText = () => {
+    const list = Array.isArray(progress.entregas) ? progress.entregas : [];
+    if (!list.length) return 'Todavía no descargaste ningún PDF. Cada descarga queda registrada como una entrega (1, 2, 3…).';
+    const last = list[list.length - 1];
+    return `Entregas registradas: ${list.length}. La última fue la N.º ${last.n}, el ${new Date(last.fecha).toLocaleDateString('es-UY')}, con nota ${Number(last.nota).toFixed(1)}.`;
+  };
+  const onPdf = async (btn) => {
+    pdfMsg.className = 'sqlr-pdf-msg';
+    if (!student.name.trim() || !student.group.trim()) {
+      pdfMsg.classList.add('fail');
+      pdfMsg.textContent = 'Antes de descargar, escribí tu nombre y apellido y tu grupo.';
+      (student.name.trim() ? groupIn : nameIn).focus();
+      return;
+    }
+    if (window.self !== window.top) {
+      pdfMsg.classList.add('fail');
+      pdfMsg.textContent = 'Desde esta vista no se pueden descargar archivos. Abrí el juego en su página de GitHub (shana2222.github.io/gta-sql) para descargar el PDF.';
+      return;
+    }
+    btn.disabled = true;
+    const label = btn.textContent;
+    btn.textContent = 'Generando PDF…';
+    try {
+      const { filename, entrega } = await downloadProgressPdf({ student, progress, PHASES, MISSIONS, BONUS, CENTERS, save: () => save(KEY_PROGRESS, progress) });
+      pdfMsg.classList.add('ok');
+      pdfMsg.textContent = `Listo: se descargó «${filename}» (entrega N.º ${entrega.n}, código ${entrega.code}). Subilo a la tarea de CREA.`;
+      reportEl?.querySelector('.sqlr-entregas')?.replaceChildren(entregasText());
+    } catch (err) {
+      pdfMsg.classList.add('fail');
+      pdfMsg.textContent = `No se pudo generar el PDF: ${err.message}. Revisá la conexión a internet y probá de nuevo.`;
+    } finally {
+      btn.disabled = false;
+      btn.textContent = label;
+    }
+  };
   const byKind = ['DDL', 'DML', 'DQL'].map((k) => {
     const all = PHASES.filter((p) => p.kind === k);
     const d = all.filter((p) => progress.completed[p.id]).length;
@@ -580,8 +617,11 @@ function openReport() {
         return h('div', { class: `sqlr-bonus-item${d === all.length ? ' done' : ''}` }, h('span', { class: 'sqlr-bonus-icon', 'aria-hidden': 'true' }, c.icon), h('b', {}, c.name), h('small', {}, d === all.length ? '✔ completa' : `${d}/${all.length}`));
       })),
       h('p', { class: 'shanuki-credit sqlr-credit', html: 'Recurso educativo <span class="sk-logo">SHANUKI</span>' }),
+      h('div', { class: 'sqlr-entregas' }, entregasText()),
+      pdfMsg,
       h('div', { class: 'sqlr-actions sqlr-noprint' },
-        window.self === window.top ? h('button', { type: 'button', class: 'sqlc-btn sqlc-btn-primary', onclick: () => window.print() }, '🖨 Imprimir / Guardar PDF') : null,
+        h('button', { type: 'button', class: 'sqlc-btn sqlc-btn-primary sqlr-pdf-btn', onclick: (e) => onPdf(e.currentTarget) }, '⬇ Descargar PDF de avance'),
+        window.self === window.top ? h('button', { type: 'button', class: 'sqlc-btn', onclick: () => window.print() }, '🖨 Imprimir') : null,
         h('button', { type: 'button', class: 'sqlc-btn sqlc-btn-danger', onclick: () => resetAll() }, 'Borrar mi progreso SQL'))));
   applyTheme(reportEl);
   reportEl.addEventListener('keydown', (e) => { e.stopPropagation(); if (e.key === 'Escape') { reportEl.remove(); reportEl = null; } });
@@ -601,6 +641,7 @@ async function resetAll() {
   if (!(await askConfirm('¿Borrar TODO tu progreso SQL y tu base de datos? Esto no se puede deshacer.', { okText: 'Borrar todo', danger: true }))) return;
   progress.completed = {};
   progress.code = {};
+  progress.entregas = [];
   engine = new SqlEngine();
   persist();
   reportEl?.remove();

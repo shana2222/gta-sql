@@ -67,7 +67,9 @@ El modelo de datos es el mismo de la evaluación (BANDA, MIEMBRO, VEHICULO, MISI
 
 ### Reporte de avance
 
-El chip **📊 Nota** abre el reporte: nombre y grupo del estudiante, nota en vivo **(fases logradas ÷ 27) × 10**, avance por DDL/DML/DQL, estado de cada fase y botón **Imprimir / Guardar PDF** (usa el diálogo del navegador).
+El chip **📊 Nota** abre el reporte. Con **⬇ Descargar PDF de avance** el estudiante baja un PDF para entregar (por ejemplo, en una tarea de CREA). Cada descarga queda registrada como una **entrega numerada** (1, 2, 3…) con fecha, nota y un código de entrega. El PDF incluye los datos del estudiante, la nota, el avance por DDL/DML/DQL, las **novedades desde la entrega anterior**, las 27 fases con la fecha en que se lograron, las misiones nerds, el **historial de entregas** y la **evidencia** (las sentencias SQL correctas de cada fase). El nombre y el grupo son obligatorios para descargar. El código de entrega sirve para identificar cada PDF, pero no impide que alguien lo edite.
+
+Además, el reporte en pantalla muestra: nombre y grupo del estudiante, nota en vivo **(fases logradas ÷ 27) × 10**, avance por DDL/DML/DQL, estado de cada fase y botón **Imprimir / Guardar PDF** (usa el diálogo del navegador).
 
 Todo se guarda **en el navegador del estudiante** (`localStorage`): base de datos, progreso, nombre y tema. No hay servidor ni cuentas. Si cambia de computadora o borra los datos del navegador, empieza de cero.
 
