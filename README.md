@@ -4,7 +4,7 @@
 
 <h1 align="center">GTA SQL: Bajo Mundo de Datos</h1>
 
-<p align="center"><strong>SHANUKI · por Shana</strong></p>
+<p align="center"><strong>SHANUKI</strong></p>
 
 <p align="center"><strong>Práctica de SQL (DDL, DML y DQL) en forma de juego de mundo abierto, para Introducción a Bases de Datos.</strong></p>
 
@@ -87,6 +87,6 @@ Las fases, sus consignas y cómo se verifica cada una están en `src/sql/challen
 
 ## Créditos
 
-**Recurso educativo del proyecto SHANUKI, creado por Shana** para las clases de Introducción a Bases de Datos (Plan Ceibal, Uruguay).
+**Recurso educativo del proyecto SHANUKI** para las clases de Introducción a Bases de Datos (Plan Ceibal, Uruguay).
 
 El motor del juego (ciudad, tránsito, física, escenas, inventario) es el proyecto de código abierto **GTA — Guanabara Testando Agentes**, creado por Gustavo Guanabara ([Curso em Vídeo](https://www.youtube.com/cursoemvideo)). Esta versión reemplaza la historia, traduce la interfaz al español y agrega la terminal SQL, las fases y el reporte de avance.
