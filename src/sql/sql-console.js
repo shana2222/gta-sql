@@ -64,6 +64,37 @@ if (typeof document !== 'undefined') {
   });
 }
 
+/* ---------------- confirmación dentro de la página (sin window.confirm) ---------------- */
+function askConfirm(message, { okText = 'Sí', cancelText = 'Cancelar', danger = false } = {}) {
+  return new Promise((resolve) => {
+    const prevFocus = document.activeElement;
+    const box = document.createElement('div');
+    box.className = 'sqlc-confirm';
+    box.setAttribute('role', 'alertdialog');
+    box.setAttribute('aria-modal', 'true');
+    const card = document.createElement('div');
+    card.className = 'sqlc-confirm-card';
+    const msg = document.createElement('p');
+    msg.textContent = message;
+    const actions = document.createElement('div');
+    actions.className = 'sqlc-confirm-actions';
+    const cancel = document.createElement('button');
+    cancel.type = 'button'; cancel.className = 'sqlc-btn'; cancel.textContent = cancelText;
+    const ok = document.createElement('button');
+    ok.type = 'button'; ok.className = `sqlc-btn ${danger ? 'sqlc-btn-danger-solid' : 'sqlc-btn-primary'}`; ok.textContent = okText;
+    actions.append(cancel, ok);
+    card.append(msg, actions);
+    box.append(card);
+    const finish = (v) => { box.remove(); try { prevFocus?.focus?.(); } catch { /* nada */ } resolve(v); };
+    cancel.addEventListener('click', () => finish(false));
+    ok.addEventListener('click', () => finish(true));
+    box.addEventListener('keydown', (e) => { e.stopPropagation(); if (e.key === 'Escape') { e.preventDefault(); finish(false); } });
+    mount(box);
+    applyTheme(box);
+    setTimeout(() => cancel.focus(), 20);
+  });
+}
+
 /* ---------------- tema claro / oscuro ---------------- */
 function applyTheme(root) {
   const t = load(KEY_THEME, null);
@@ -379,9 +410,8 @@ async function copyPhaseCode() {
   }
 }
 
-function repairDb() {
-  // eslint-disable-next-line no-alert
-  if (!window.confirm('¿Reparar la base?\n\nSe borra lo que hiciste en la práctica libre y la base vuelve al estado correcto de las fases que ya lograste. Tu nota no cambia.')) return;
+async function repairDb() {
+  if (!(await askConfirm('¿Reparar la base? Se borra lo que hiciste en la práctica libre y la base vuelve al estado correcto de las fases que ya lograste. Tu nota no cambia.', { okText: 'Reparar' }))) return;
   const completedSet = new Set(PHASES.filter((p) => progress.completed[p.id]).map((p) => p.id));
   engine = new SqlEngine(rebuildState(completedSet));
   const p = currentPhase();
@@ -433,14 +463,17 @@ function open() {
   setTimeout(() => u.editor.focus(), 30);
 }
 
-function close(solved) {
-  if (!ui || ui.root.hidden) return;
+let closing = false;
+async function close(solved) {
+  if (!ui || ui.root.hidden || closing) return;
   const s = session;
   if (s?.mode === 'mission' && !solved) {
     const pending = s.queue.filter((q) => !progress.completed[q.id]).length;
     if (pending > 0) {
-      // eslint-disable-next-line no-alert
-      if (!window.confirm(`Te ${pending === 1 ? 'falta 1 fase' : `faltan ${pending} fases`} de esta misión.\n¿Salir de la terminal? Vas a poder volver a abrirla desde la escena.`)) return;
+      closing = true;
+      const leave = await askConfirm(`Te ${pending === 1 ? 'falta 1 fase' : `faltan ${pending} fases`} de esta misión. ¿Salir de la terminal? Vas a poder volver a abrirla desde la escena.`, { okText: 'Salir', cancelText: 'Seguir acá' });
+      closing = false;
+      if (!leave || session !== s) return;
     }
   }
   ui.root.hidden = true;
@@ -548,7 +581,7 @@ function openReport() {
       })),
       h('p', { class: 'shanuki-credit sqlr-credit', html: 'Recurso educativo <span class="sk-logo">SHANUKI</span>' }),
       h('div', { class: 'sqlr-actions sqlr-noprint' },
-        h('button', { type: 'button', class: 'sqlc-btn sqlc-btn-primary', onclick: () => window.print() }, '🖨 Imprimir / Guardar PDF'),
+        window.self === window.top ? h('button', { type: 'button', class: 'sqlc-btn sqlc-btn-primary', onclick: () => window.print() }, '🖨 Imprimir / Guardar PDF') : null,
         h('button', { type: 'button', class: 'sqlc-btn sqlc-btn-danger', onclick: () => resetAll() }, 'Borrar mi progreso SQL'))));
   applyTheme(reportEl);
   reportEl.addEventListener('keydown', (e) => { e.stopPropagation(); if (e.key === 'Escape') { reportEl.remove(); reportEl = null; } });
@@ -564,9 +597,8 @@ function openReport() {
   nameIn.focus();
 }
 
-function resetAll() {
-  // eslint-disable-next-line no-alert
-  if (!window.confirm('¿Borrar TODO tu progreso SQL y tu base de datos?\nEsto no se puede deshacer.')) return;
+async function resetAll() {
+  if (!(await askConfirm('¿Borrar TODO tu progreso SQL y tu base de datos? Esto no se puede deshacer.', { okText: 'Borrar todo', danger: true }))) return;
   progress.completed = {};
   progress.code = {};
   engine = new SqlEngine();
