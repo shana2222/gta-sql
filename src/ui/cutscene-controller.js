@@ -6,7 +6,7 @@ import {
   setUiInputMode,
 } from './input-mode.js?v=1';
 import { WebModalController } from './web-modal.js?v=1';
-import { openSqlChallenge } from '../sql/sql-console.js?v=10';
+import { openSqlChallenge } from '../sql/sql-console.js?v=11';
 
 export class CutsceneController {
   constructor() {

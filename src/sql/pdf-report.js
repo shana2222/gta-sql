@@ -1,4 +1,5 @@
 // Reporte de avance del estudiante en PDF (jsPDF 2.5.1 desde cdnjs, CDN aprobado por Ceibal).
+import { computeBadges } from './badges.js';
 // Cada descarga queda registrada como una "entrega" numerada para seguir el avance en el tiempo.
 
 const JSPDF_URL = 'https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js';
@@ -175,6 +176,13 @@ export async function downloadProgressPdf({ student, progress, PHASES, MISSIONS,
     const all = BONUS.filter((p) => p.center === key); const d = all.filter((p) => progress.completed[p.id]).length;
     para(`• ${c.full}: ${d}/${all.length}${d === all.length ? ' (completa)' : ''}`, { indent: 1, col: d === all.length ? C.green : C.ink });
   }
+
+  // ---------- insignias ----------
+  const badges = computeBadges(progress);
+  const won = badges.filter((b) => b.earned);
+  section(`Insignias: ${won.length} de ${badges.length}`);
+  if (!won.length) para('Todavía no ganó insignias.', { col: C.muted });
+  else para(won.map((b) => `${b.name}${b.group === 'Misiones' ? ` (${b.title})` : ''}`).join(' · '), { col: C.green });
 
   // ---------- historial ----------
   const historial = [...progress.entregas, entrega];

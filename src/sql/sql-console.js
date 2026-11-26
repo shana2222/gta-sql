@@ -3,6 +3,7 @@ import { SqlEngine, splitStatements } from './sql-engine.js';
 import { PHASES, MISSIONS, DB_NAME, phasesFor, rebuildState, BONUS, CENTERS, seedBonus } from './challenges.js';
 import { renderGuide } from './guide.js';
 import { downloadProgressPdf } from './pdf-report.js';
+import { computeBadges, earnedIds } from './badges.js';
 
 const KEY_DB = 'gtasql.db.v1';
 const KEY_PROGRESS = 'gtasql.progress.v1';
@@ -370,7 +371,10 @@ function runEditor() {
   if (p && !progress.completed[p.id]) {
     const verdict = p.check({ engine, state: engine.state, lastResults: results });
     if (verdict.ok) {
+      const badgesBefore = earnedIds(progress);
       progress.completed[p.id] = new Date().toISOString();
+      const nuevas = computeBadges(progress).filter((b) => b.earned && !badgesBefore.has(b.id));
+      nuevas.forEach((b, i) => setTimeout(() => showToast(`🏅 ¡Nueva insignia: ${b.icon} ${b.name}! Mirala en tu inventario.`), 400 + i * 2800));
       showSuccess(p);
       renderStepsOnly();
     } else if (hadError) {
@@ -649,10 +653,41 @@ async function resetAll() {
   if (ui && !ui.root.hidden) { renderLeft(); renderSchema(); }
 }
 
+/* ---------------- insignias en el inventario ---------------- */
+function renderInventoryBadges() {
+  const screen = document.getElementById('inventory-screen');
+  const card = screen?.querySelector('.inventory-card');
+  if (!card) return;
+  let box = card.querySelector('.inv-badges');
+  if (!box) {
+    box = h('section', { class: 'inv-badges', 'aria-label': 'Insignias' });
+    const actions = card.querySelector('.inventory-actions');
+    card.insertBefore(box, actions);
+  }
+  const list = computeBadges(progress);
+  const got = list.filter((b) => b.earned).length;
+  const info = h('p', { class: 'inv-badges-info', 'aria-live': 'polite' }, 'Tocá una insignia para ver cómo se gana.');
+  const groups = ['Misiones', 'Habilidades', 'Misiones nerds'].map((g) => h('div', { class: 'inv-badges-group' },
+    h('span', { class: 'inv-badges-label' }, g),
+    h('div', { class: 'inv-badges-row' }, list.filter((b) => b.group === g).map((b) => h('button', {
+      type: 'button', class: `inv-badge${b.earned ? ' earned' : ''}`, title: `${b.name} — ${b.desc}`,
+      'aria-label': `${b.name}: ${b.earned ? 'ganada' : `bloqueada, ${b.progress}`}`,
+      onclick: () => { info.textContent = `${b.earned ? '🏅' : '🔒'} ${b.name} (${b.title}) · ${b.desc}`; },
+    }, h('span', { class: 'inv-badge-icon', 'aria-hidden': 'true' }, b.earned ? b.icon : '🔒'), h('span', { class: 'inv-badge-name' }, b.name))))));
+  box.replaceChildren(h('div', { class: 'inv-badges-head' }, h('b', {}, '🏅 Insignias'), h('span', {}, `${got} de ${list.length}`)), ...groups, info);
+}
+function watchInventory() {
+  const screen = document.getElementById('inventory-screen');
+  if (!screen) { setTimeout(watchInventory, 500); return; }
+  const check = () => { if (!screen.classList.contains('hidden')) renderInventoryBadges(); };
+  new MutationObserver(check).observe(screen, { attributes: true, attributeFilter: ['class'] });
+  check();
+}
+
 /* ---------------- arranque ---------------- */
 if (typeof document !== 'undefined') {
-  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', buildFab);
-  else buildFab();
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', () => { buildFab(); watchInventory(); });
+  else { buildFab(); watchInventory(); }
   window.gtaSql = { openFreePractice, openSqlChallenge, getGrade, openReport, nerdDone: (center) => BONUS.filter((p) => p.center === center).every((p) => progress.completed[p.id]) && BONUS.some((p) => p.center === center) };
 }
 

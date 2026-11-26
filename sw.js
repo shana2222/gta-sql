@@ -1,4 +1,4 @@
-const SHELL_CACHE = 'gta-sql-shell-v13';
+const SHELL_CACHE = 'gta-sql-shell-v14';
 const ASSETS_CACHE = 'gta-sql-assets-v6';
 
 const IMAGE_EXT_RE = /\.(png|jpe?g|webp|gif|svg)$/i;
