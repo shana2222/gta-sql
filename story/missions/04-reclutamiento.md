@@ -41,4 +41,4 @@ bg: Taller de Chispa
 - SQL: mision-4
 - Chispa: ¡Bienvenida oficialmente a la familia, Byte! Ya sos una fila de la tabla miembro.
 - Byte: Chispa, una pregunta. ¿Anoche estuviste acá, en el taller?
-- Chispa: ¿Anoche? Eh… estaba… durmiendo. Muy dormido. Andá, que Pepe tiene datos para vos.
+- Chispa: ¿Anoche? Eh… estaba… durmiendo. Muy dormida. Andá, que Tito tiene datos para vos.

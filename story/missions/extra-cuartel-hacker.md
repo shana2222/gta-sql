@@ -13,8 +13,8 @@ right: nube
 bg: Cuartel del Hacker
 
 - Nube: Pasá, Byte. Te estaba esperando. ¿Mate?
-- Byte: ¿Usted es Nube? Dicen que fue la mejor hacker de Santa Bruma.
-- Nube: Fui. Ahora enseño. Acá podés practicar SQL sin miedo: lo que hagas no cambia tu nota.
+- Byte: ¿Vos sos Nube? Dicen que sos la mejor hacker de Santa Bruma.
+- Nube: Dicen muchas cosas. Ahora enseño. Acá podés practicar SQL sin miedo: lo que hagas no cambia tu nota.
 - Byte: ¿Y si rompo la base?
 - Nube: Para eso está el botón Reparar base. Equivocarse es parte del oficio. Lo importante es leer bien el error.
 - OPCAO: Quiero practicar. -> NEXT

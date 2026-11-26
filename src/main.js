@@ -19,7 +19,7 @@ import {
   preloadMissionAssets,
   preloadStoryAssets,
   refreshAllStoryAssets
-} from './story/story-loader.js?v=27';
+} from './story/story-loader.js?v=28';
 
 function waitMs(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms));

@@ -46,7 +46,7 @@ Son **misiones del mundo libre**: están siempre en el mapa y se hacen en cualqu
 | 🔐 INET — Instituto Normal de Enseñanza Técnica | Profe Bit | `inet_cerraduras` | `UPDATE` sin `WHERE` (¡por única vez!) · `SUM` |
 | 🏛️ Palacio Legislativo | Delia (guía) | `palacio_visitas` | `INSERT` · `SUM` + `GROUP BY` |
 
-En el Palacio Legislativo hay una placa de homenaje a José "Pepe" Mujica, con datos de su trayectoria (diputado, senador y presidente de Uruguay entre 2010 y 2015).
+En el Palacio Legislativo aparece **Pepe Mujica como homenaje** (presidente de Uruguay entre 2010 y 2015), con diálogos amables sobre aprender y cuidar la memoria. La escena aclara que sus diálogos en el juego son ficticios, y está separada de la historia de la banda.
 
 ### La ciudad
 

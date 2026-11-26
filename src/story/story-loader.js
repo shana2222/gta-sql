@@ -58,6 +58,8 @@ export function getCharacterSidePngCandidates(basePath, charId, view) {
       `${cleanBase}/characters/${charId}/${charId}-right.png`,
     );
   }
+  // Retratos ilustrados en JPG (más livianos)
+  candidates.push(`${cleanBase}/characters/${charId}.jpg`);
   return candidates;
 }
 

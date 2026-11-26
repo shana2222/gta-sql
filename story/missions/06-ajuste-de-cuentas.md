@@ -14,15 +14,15 @@ wrong_item_message: Eso no es una foto.
 
 ## CUTSCENE_INICIO
 left: byte
-right: pepe
+right: tito
 bg: Depósito del Puerto
 
-- Pepe: Te dije que venía la redada. La policía atrapó a Kobra, el jefe de Los Halcones.
+- Tito: Te dije que venía la redada. La policía atrapó a Kobra, el jefe de Los Halcones.
 - Byte: Entonces Kobra ya no está en la calle. Hay que sacarlo de la base, a él y a su auto.
-- Pepe: Hay más. Alguien sacó una foto de la redada, quedó en la PRACA-07. Y en la foto se ve una pickup marrón… la de Rayo.
+- Tito: Hay más. Alguien sacó una foto de la redada, quedó en la PRACA-07. Y en la foto se ve una pickup marrón… la de Rayo.
 - OPCAO: ¿Cómo sabés todo eso? -> NEXT
 - OPCAO: ¿Cuánto me cobrás por este dato? -> NEXT
-- Pepe: Este va de regalo. Saber cosas es mi trabajo. Rayo está en su garaje, COM-14.
+- Tito: Este va de regalo. Saber cosas es mi trabajo. Rayo está en su garaje, COM-14.
 
 ## CUTSCENE_FIM
 left: byte

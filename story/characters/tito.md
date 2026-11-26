@@ -1,6 +1,6 @@
 ---
-id: pepe
-name: Pepe
+id: tito
+name: Tito
 profile: Traficante de los Vagos del Puerto. Vende información… a buen precio.
 traits: Simpático, interesado, conoce a todo el mundo
 sprite_top: assets/alex-top.svg

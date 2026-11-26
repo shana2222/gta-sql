@@ -21,10 +21,10 @@ export const DATA = {
     cols: ['alias', 'respeto', 'rol', 'id_banda'],
     rows: [
       ['Vera', 95, 'Jefa', 1],
-      ['Chispa', 65, 'Subjefe', 1],
+      ['Chispa', 65, 'Subjefa', 1],
       ['Rayo', 40, 'Matón', 1],
       ['Kobra', 70, 'Jefe', 2],
-      ['Pepe', 60, 'Traficante', 3],
+      ['Tito', 60, 'Traficante', 3],
       ['Byte', 10, 'Hacker', 1],
     ],
   },
