@@ -198,6 +198,17 @@ function buildFab() {
   fab.addEventListener('keydown', (e) => e.stopPropagation());
   fab.addEventListener('pointerdown', (e) => e.stopPropagation());
   quick.append(fab);
+  const reportBtn = h('button', { type: 'button', id: 'report-hud-button', class: 'hud-pill pause-button sqlc-hud-btn sqlc-report-btn', title: 'Ver tu reporte de avance y descargar el PDF', 'aria-label': 'Abrir mi reporte de avance', onclick: () => openReport() },
+    h('span', { 'aria-hidden': 'true' }, '📄'), h('span', { class: 'sqlc-hud-label' }, 'Mi reporte'));
+  reportBtn.addEventListener('keydown', (e) => e.stopPropagation());
+  reportBtn.addEventListener('pointerdown', (e) => e.stopPropagation());
+  quick.append(reportBtn);
+  // también en el menú de pausa
+  const pauseActions = document.querySelector('#pause-screen .pause-actions');
+  if (pauseActions && !document.getElementById('pause-report-btn')) {
+    const b = h('button', { type: 'button', id: 'pause-report-btn', class: 'secondary-button', onclick: () => openReport() }, '📄 MI REPORTE DE AVANCE');
+    pauseActions.insertBefore(b, pauseActions.children[1] || null);
+  }
   refreshChips();
 }
 

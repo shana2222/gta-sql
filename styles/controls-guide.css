@@ -122,3 +122,5 @@
 .inv-badge { width: 32px; }
 .inv-badge-icon { width: 30px; height: 30px; font-size: 15px; }
 #inventory-screen .inventory-card { max-height: calc(100vh - 24px); overflow-y: auto; }
+.sqlc-report-btn { justify-content: center; gap: 6px; }
+#sqlr-root { z-index: 9700; }
