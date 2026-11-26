@@ -25,7 +25,7 @@
   <title>GTA SQL — Bajo Mundo de Datos</title>
   <link rel="stylesheet" href="./styles/main.css?v=42">
   <link rel="stylesheet" href="./styles/sql-console.css?v=8">
-  <link rel="stylesheet" href="./styles/controls-guide.css?v=4">
+  <link rel="stylesheet" href="./styles/controls-guide.css?v=5">
 </head>
 <body>
   <div id="game-shell">
@@ -277,10 +277,12 @@
         </div>
         <div class="expanded-map-legend">
           <span class="legend-chip"><i class="legend-dot legend-player"></i> Vos</span>
-          <span class="legend-chip"><i class="legend-dot legend-target"></i> Destino</span>
+          <span class="legend-chip"><i class="legend-dot legend-target"></i> Misión</span>
           <span class="legend-chip"><i class="legend-dot legend-route"></i> Ruta</span>
           <span class="legend-chip"><i class="legend-dot legend-extra"></i> Extras (?)</span>
           <span class="legend-chip"><i class="legend-dot legend-hospital"></i> Hospitales</span>
+          <span class="legend-chip"><i class="legend-dot" style="background:#fbbf24"></i> ⭐ Misiones secundarias</span>
+          <span class="legend-chip"><i class="legend-dot" style="background:#d946ef"></i> 📍 Tu destino</span>
         </div>
       </div>
     </section>
@@ -389,8 +391,8 @@
       });
     })();
   </script>
-  <script type="module" src="./src/main.js?v=79"></script>
-  <script type="module" src="./src/sql/sql-console.js?v=9"></script>
+  <script type="module" src="./src/main.js?v=81"></script>
+  <script type="module" src="./src/sql/sql-console.js?v=10"></script>
   <script type="module" src="./src/ui/controls-guide.js?v=3"></script>
 </body>
 </html>

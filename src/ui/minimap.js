@@ -119,6 +119,20 @@ export class Minimap {
       ctx.stroke();
     }
 
+    const overlay = this.overlay || {};
+    const wr = overlay.waypointRoute;
+    if (overlay.waypoint && wr && wr.length > 1) {
+      ctx.save();
+      ctx.strokeStyle = '#d946ef';
+      ctx.lineWidth = expanded ? 3.5 : 2.5;
+      ctx.setLineDash(expanded ? [10, 7] : [6, 4]);
+      ctx.beginPath();
+      ctx.moveTo(toMiniX(wr[0].x), toMiniY(wr[0].y));
+      for (let i = 1; i < wr.length; i += 1) ctx.lineTo(toMiniX(wr[i].x), toMiniY(wr[i].y));
+      ctx.stroke();
+      ctx.restore();
+    }
+
     if (objectivePoint) {
       const rawOx = toMiniX(objectivePoint.x);
       const rawOy = toMiniY(objectivePoint.y);
@@ -191,6 +205,82 @@ export class Minimap {
         ctx.strokeText('?', cx, cy);
         ctx.fillText('?', cx, cy);
       }
+      ctx.restore();
+    }
+
+    // Misiones secundarias (centros nerds y cuartel)
+    for (const pin of overlay.sidePins || []) {
+      const px = toMiniX(pin.x);
+      const py = toMiniY(pin.y);
+      if (px < -20 || px > w + 20 || py < -20 || py > h + 20) continue;
+      const r = expanded ? 15 : 7;
+      ctx.save();
+      ctx.beginPath();
+      ctx.arc(px, py, r + (expanded ? 3 : 1.5), 0, Math.PI * 2);
+      ctx.fillStyle = pin.done ? '#22c55e' : '#fbbf24';
+      ctx.fill();
+      ctx.lineWidth = expanded ? 2 : 1;
+      ctx.strokeStyle = '#0f172a';
+      ctx.stroke();
+      const img = pin.logo ? this.#getOrLoadLogo(pin.logo) : null;
+      if (img && !img._failed && img.complete && img.naturalWidth > 0) {
+        ctx.beginPath();
+        ctx.arc(px, py, r, 0, Math.PI * 2);
+        ctx.clip();
+        ctx.drawImage(img, px - r, py - r, r * 2, r * 2);
+      } else {
+        ctx.fillStyle = pin.color || '#1f6feb';
+        ctx.beginPath();
+        ctx.arc(px, py, r, 0, Math.PI * 2);
+        ctx.fill();
+      }
+      ctx.restore();
+      if (expanded) {
+        ctx.save();
+        const fs = Math.max(12, Math.round(Math.min(w, h) * 0.024));
+        ctx.font = `800 ${fs}px system-ui, sans-serif`;
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'top';
+        ctx.lineWidth = 4;
+        ctx.strokeStyle = '#0f172a';
+        const label = `${pin.done ? '✔ ' : '⭐ '}${pin.label}`;
+        const half = ctx.measureText(label).width * 0.5 + 6;
+        const lx = Math.max(half, Math.min(w - half, px));
+        ctx.strokeText(label, lx, py + r + 6);
+        ctx.fillStyle = pin.done ? '#86efac' : '#fde68a';
+        ctx.fillText(label, lx, py + r + 6);
+        ctx.restore();
+      }
+    }
+
+    // Destino marcado por el jugador
+    if (overlay.waypoint) {
+      const rawX = toMiniX(overlay.waypoint.x);
+      const rawY = toMiniY(overlay.waypoint.y);
+      const pad = 8;
+      const out = !expanded && (rawX < pad || rawX > w - pad || rawY < pad || rawY > h - pad);
+      let wx = rawX; let wy = rawY;
+      if (out) {
+        const cx = w * 0.5; const cy = h * 0.5; const dx = rawX - cx; const dy = rawY - cy;
+        const k = Math.max(Math.abs(dx) / Math.max(1, cx - pad), Math.abs(dy) / Math.max(1, cy - pad), 1);
+        wx = cx + dx / k; wy = cy + dy / k;
+      }
+      const s = expanded ? 1.6 : 1;
+      ctx.save();
+      ctx.translate(wx, wy);
+      ctx.fillStyle = '#d946ef';
+      ctx.strokeStyle = '#0f172a';
+      ctx.lineWidth = 1.6;
+      ctx.beginPath();
+      ctx.moveTo(0, 0);
+      ctx.bezierCurveTo(-7 * s, -9 * s, -7 * s, -18 * s, 0, -18 * s);
+      ctx.bezierCurveTo(7 * s, -18 * s, 7 * s, -9 * s, 0, 0);
+      ctx.fill();
+      ctx.stroke();
+      ctx.fillStyle = '#ffffff';
+      ctx.beginPath();
+      ctx.arc(0, -12.5 * s, 2.6 * s, 0, Math.PI * 2);
+      ctx.fill();
       ctx.restore();
     }
 

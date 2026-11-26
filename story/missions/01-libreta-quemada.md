@@ -4,8 +4,8 @@ title: Misión 1 — La libreta quemada
 start: CASA-01
 pickup: PRACA-01
 pickup_objective: Buscá los restos de la Libreta en PRACA-01
-target: COM-320
-objective: Llevale la libreta a Chispa en COM-320
+target: COM-96
+objective: Llevale la libreta a Chispa en COM-96
 give_item: libreta
 require_item: libreta
 delivery_prompt: Chispa necesita la libreta para pasar todo a la computadora. Elegí el objeto:
@@ -25,7 +25,7 @@ bg: Guarida de la Familia Ceibo
 - OPCAO: Entonces necesitás una base de datos. -> NEXT
 - OPCAO: ¿Sospechás de alguien? -> NEXT
 - Vera: Quiero dos cosas, Byte. Una: que armes una base de datos que no se queme. Dos: saber quién lo hizo.
-- Vera: El viento llevó unas hojas hasta la PRACA-01, acá nomás, a dos cuadras de la guarida. Juntá lo que quede y llevalo al taller de Chispa, en COM-320. Ahí está la computadora.
+- Vera: El viento llevó unas hojas hasta la PRACA-01, acá nomás, a dos cuadras de la guarida. Juntá lo que quede y llevalo al taller de Chispa, en COM-96. Ahí está la computadora.
 
 ## CUTSCENE_FIM
 left: byte

@@ -1,11 +1,11 @@
 ---
 id: 05-libro-de-golpes
 title: Misión 5 — El libro de golpes
-start: COM-320
-pickup: PRACA-29
-pickup_objective: Buscá el Libro de Golpes en PRACA-29
-target: CASA-656
-objective: Llevale el libro a Pepe en el Depósito del Puerto (CASA-656)
+start: COM-96
+pickup: PRACA-16
+pickup_objective: Buscá el Libro de Golpes en PRACA-16
+target: CASA-181
+objective: Llevale el libro a Pepe en el Depósito del Puerto (CASA-181)
 give_item: libro-golpes
 require_item: libro-golpes
 delivery_prompt: Pepe quiere ver el libro antes de hablar. Elegí el objeto:
@@ -20,10 +20,10 @@ bg: Taller de Chispa
 - Chispa: Faltan los golpes: qué misiones hicimos, cuánto pagaron y quién participó.
 - Byte: ¿Quién sabe eso?
 - Chispa: Pepe, de los Vagos del Puerto. No es de la familia, pero vende información.
-- Chispa: Pide el Libro de Golpes a cambio. Lo escondimos en la PRACA-29.
+- Chispa: Pide el Libro de Golpes a cambio. Lo escondimos en la PRACA-16.
 - OPCAO: ¿Pepe es de confianza? -> NEXT
 - OPCAO: Voy. ¿Algún consejo? -> NEXT
-- Chispa: Contá los dedos después de darle la mano. Su depósito está en CASA-656.
+- Chispa: Contá los dedos después de darle la mano. Su depósito está en CASA-181.
 
 ## CUTSCENE_FIM
 left: byte

@@ -1,9 +1,9 @@
 ---
 id: 07-informe-para-la-jefa
 title: Misión 7 — Informe para la jefa
-start: COM-24
-pickup: PRACA-12
-pickup_objective: Buscá la Tablet de la Jefa en PRACA-12
+start: COM-14
+pickup: PRACA-08
+pickup_objective: Buscá la Tablet de la Jefa en PRACA-08
 target: CASA-01
 objective: Llevale la tablet a Vera en CASA-01
 give_item: tablet
@@ -23,7 +23,7 @@ bg: Garaje Fénix
 - Byte: Como un oráculo que nunca miente, si los datos están bien cargados.
 - OPCAO: ¿Dónde está la jefa? -> NEXT
 - OPCAO: ¿Alguien perdió algo esta vez? -> NEXT
-- Rayo: La jefa perdió la tablet en la PRACA-12. Sí. Hasta ella pierde cosas. Llevásela a la guarida.
+- Rayo: La jefa perdió la tablet en la PRACA-08. Sí. Hasta ella pierde cosas. Llevásela a la guarida.
 
 ## CUTSCENE_FIM
 left: byte

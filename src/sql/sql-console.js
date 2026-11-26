@@ -653,7 +653,7 @@ async function resetAll() {
 if (typeof document !== 'undefined') {
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', buildFab);
   else buildFab();
-  window.gtaSql = { openFreePractice, openSqlChallenge, getGrade, openReport };
+  window.gtaSql = { openFreePractice, openSqlChallenge, getGrade, openReport, nerdDone: (center) => BONUS.filter((p) => p.center === center).every((p) => progress.completed[p.id]) && BONUS.some((p) => p.center === center) };
 }
 
 export { splitStatements };

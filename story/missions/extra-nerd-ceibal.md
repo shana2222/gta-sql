@@ -1,7 +1,7 @@
 ---
 id: extra-nerd-ceibal
 npc: tecla
-location: COM-627
+location: COM-209
 prompt: Entrar a Ceibal (misión nerd)
 roof_color: #007a7a
 roof_logo: assets/logo-ceibal.svg

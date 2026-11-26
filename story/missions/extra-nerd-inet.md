@@ -1,7 +1,7 @@
 ---
 id: extra-nerd-inet
 npc: bit
-location: COM-236
+location: COM-84
 prompt: Entrar al INET (misión nerd)
 roof_color: #2ea043
 roof_logo: assets/logo-inet.svg

@@ -1,9 +1,9 @@
 ---
 id: 03-cambio-de-planes
 title: Misión 3 — Cambio de planes
-start: COM-24
-pickup: PRACA-15
-pickup_objective: Buscá el Pendrive en PRACA-15
+start: COM-14
+pickup: PRACA-06
+pickup_objective: Buscá el Pendrive en PRACA-06
 target: CASA-01
 objective: Llevale el pendrive a Vera en CASA-01
 give_item: pendrive
@@ -17,7 +17,7 @@ left: byte
 right: rayo
 bg: Garaje Fénix
 
-- Rayo: Byte, llamó la jefa. Tiene cambios para la base. Dejó las órdenes en un pendrive, escondido en la PRACA-15.
+- Rayo: Byte, llamó la jefa. Tiene cambios para la base. Dejó las órdenes en un pendrive, escondido en la PRACA-06.
 - Byte: ¿Cambios? Las tablas ya están hechas.
 - Rayo: Eso le dije. Y me dijo: "Las tablas se cambian, Rayo. Las personas no". No entendí.
 - Rayo: Ah, y en ese pendrive también hay… una tabla mía. Se llama chismes. No la abras. Bueno, abrila. Pero no le cuentes a nadie.

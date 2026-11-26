@@ -441,6 +441,66 @@ export class HudController {
     this.expandedMapCloseHandler = handler;
   }
 
+  onExpandedMapTap(handler) {
+    this.expandedMapTapHandler = handler;
+  }
+
+  onWaypointActions(handlers) {
+    this.waypointHandlers = handlers;
+    this.#ensureWaypointBar();
+  }
+
+  #ensureWaypointBar() {
+    if (this.waypointBar || !this.expandedMapCard) return;
+    const bar = document.createElement('div');
+    bar.className = 'map-waypoint-bar';
+    bar.innerHTML = `<p class="map-waypoint-hint">👆 Tocá el mapa para marcar un destino. Los íconos ⭐ son misiones secundarias.</p>
+      <div class="map-waypoint-info" hidden><span class="map-waypoint-pin" aria-hidden="true">📍</span><span class="map-waypoint-name"></span>
+      <button type="button" class="primary-button map-waypoint-ride">🚕 Pedir un Ubyte</button>
+      <button type="button" class="secondary-button map-waypoint-clear">Quitar destino</button></div>`;
+    const stage = this.expandedMapCard.querySelector('.expanded-map-stage');
+    stage?.after(bar);
+    bar.querySelector('.map-waypoint-ride').addEventListener('click', () => this.waypointHandlers?.ride?.());
+    bar.querySelector('.map-waypoint-clear').addEventListener('click', () => this.waypointHandlers?.clear?.());
+    this.waypointBar = bar;
+  }
+
+  setWaypointBar(wp) {
+    this.#ensureWaypointBar();
+    if (!this.waypointBar) return;
+    const info = this.waypointBar.querySelector('.map-waypoint-info');
+    const hint = this.waypointBar.querySelector('.map-waypoint-hint');
+    if (wp) {
+      this.waypointBar.querySelector('.map-waypoint-name').textContent = `Destino: ${wp.name}`;
+      info.hidden = false;
+      hint.hidden = true;
+    } else {
+      info.hidden = true;
+      hint.hidden = false;
+    }
+  }
+
+  showRideOverlay(name) {
+    if (!this.rideOverlay) {
+      const el = document.createElement('div');
+      el.className = 'ride-overlay';
+      el.setAttribute('role', 'status');
+      el.innerHTML = '<div class="ride-card"><div class="ride-car" aria-hidden="true">🚕</div><p class="ride-title">Tu Ubyte va en camino…</p><p class="ride-dest"></p><div class="ride-road" aria-hidden="true"><span></span></div></div>';
+      (this.shell || document.body).append(el);
+      this.rideOverlay = el;
+    }
+    this.rideOverlay.querySelector('.ride-dest').textContent = `Destino: ${name}`;
+    this.rideOverlay.classList.remove('hidden');
+    void this.rideOverlay.offsetWidth;
+    this.rideOverlay.classList.add('show');
+  }
+
+  hideRideOverlay() {
+    if (!this.rideOverlay) return;
+    this.rideOverlay.classList.remove('show');
+    setTimeout(() => this.rideOverlay?.classList.add('hidden'), 350);
+  }
+
   onExpandedMapTransform(handler) {
     this.expandedMapTransformHandler = handler;
   }
@@ -488,6 +548,7 @@ export class HudController {
       canvas.setPointerCapture?.(e.pointerId);
       const pt = this.#toExpandedCanvasPoint(e.clientX, e.clientY);
       this.expandedMapPointers.set(e.pointerId, pt);
+      this.mapTapCandidate = this.expandedMapPointers.size === 1 ? { id: e.pointerId, x: e.clientX, y: e.clientY, t: performance.now() } : null;
     });
 
     canvas.addEventListener('pointermove', (e) => {
@@ -538,6 +599,14 @@ export class HudController {
     const releasePointer = (e) => {
       this.expandedMapPointers.delete(e.pointerId);
     };
+    canvas.addEventListener('pointerup', (e) => {
+      const tap = this.mapTapCandidate;
+      this.mapTapCandidate = null;
+      if (tap && tap.id === e.pointerId && Math.hypot(e.clientX - tap.x, e.clientY - tap.y) < 8 && performance.now() - tap.t < 600) {
+        const pt = this.#toExpandedCanvasPoint(e.clientX, e.clientY);
+        this.expandedMapTapHandler?.({ canvasX: pt.x, canvasY: pt.y });
+      }
+    });
     canvas.addEventListener('pointerup', releasePointer);
     canvas.addEventListener('pointercancel', releasePointer);
   }

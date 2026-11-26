@@ -1,5 +1,5 @@
-import { CityMap } from '../world/city-map.js?v=30';
-import { RoadPathfinder } from '../world/pathfinding.js';
+import { CityMap } from '../world/city-map.js?v=31';
+import { RoadPathfinder } from '../world/pathfinding.js?v=2';
 import { TrafficManager } from '../world/traffic-manager.js?v=24';
 import { BoatManager } from '../world/boat-manager.js?v=17';
 import { InputManager } from '../input/input-manager.js?v=20';
@@ -23,7 +23,7 @@ import {
   updateVehicle,
   updateVehicleCriticalState
 } from '../physics/vehicle-physics.js?v=18';
-import { Minimap } from '../ui/minimap.js?v=27';
+import { Minimap } from '../ui/minimap.js?v=29';
 import { Inventory } from './inventory.js?v=20';
 import { createSaveSnapshot, saveGameState } from './save-state.js?v=3';
 import { getPendingMissionAssetUrls, preloadMissionAssets } from '../story/story-loader.js';
@@ -87,6 +87,10 @@ export class Engine {
     this.smokeParticles = [];
     this.explosions = [];
     this.routePoints = [];
+    this.waypoint = null;
+    this.waypointRoute = [];
+    this.waypointTimer = 0;
+    this.rideInProgress = false;
     this.objectiveCode = null;
     this.objectivePoint = null;
     this.objectiveNpcPoint = null;
@@ -146,6 +150,8 @@ export class Engine {
     });
     this.hud.onExpandedMapClose(() => this.closeExpandedMap());
     this.hud.onExpandedMapTransform((action) => this.#applyExpandedMapTransform(action));
+    this.hud.onExpandedMapTap?.((pt) => this.#onExpandedMapTap(pt));
+    this.hud.onWaypointActions?.({ ride: () => this.#rideToWaypoint(), clear: () => this.clearWaypoint() });
     this.expandedMapView = { zoom: 1, centerX: 0, centerY: 0 };
 
     this.#onKeyDown = (e) => {
@@ -847,6 +853,131 @@ export class Engine {
     return marks;
   }
 
+  /* ---------- Destino marcado en el mapa + viaje (Ubyte) ---------- */
+  #sidePins() {
+    if (this._sidePins && this._sidePinsKey === this.encounterNpcs.length) return this._sidePins;
+    const pins = [];
+    for (const npc of this.encounterNpcs || []) {
+      try {
+        const loc = this.cityMap.resolveLocationCode(npc.location);
+        const b = loc.bounds;
+        const full = this.locationNames?.get(npc.location) || npc.location;
+        pins.push({
+          id: npc.id,
+          code: npc.location,
+          center: npc.id.startsWith('extra-nerd-') ? npc.id.slice('extra-nerd-'.length) : null,
+          x: b.x + b.w * 0.5,
+          y: b.y + b.h * 0.5,
+          name: full,
+          label: full.split(' — ')[0],
+          logo: this.encounterLocationCodes.get(npc.location)?.roofLogo || '',
+          color: this.encounterLocationCodes.get(npc.location)?.roofColor || '#1f6feb',
+        });
+      } catch { /* lugar inválido: se ignora */ }
+    }
+    this._sidePins = pins;
+    this._sidePinsKey = this.encounterNpcs.length;
+    return pins;
+  }
+
+  #syncMapOverlay() {
+    const done = (c) => Boolean(c && typeof window !== 'undefined' && window.gtaSql?.nerdDone?.(c));
+    this.minimap.overlay = {
+      waypoint: this.waypoint,
+      waypointRoute: this.waypointRoute,
+      sidePins: this.#sidePins().map((p) => ({ ...p, done: done(p.center) })),
+    };
+  }
+
+  #expandedCanvasToWorld(canvasX, canvasY) {
+    const canvas = this.hud.expandedMapCanvas;
+    const scale = this.minimap.getExpandedBaseScale(canvas, this.cityMap) * Math.max(1, Math.min(6, this.expandedMapView.zoom || 1));
+    return {
+      x: this.expandedMapView.centerX + (canvasX - canvas.width * 0.5) / scale,
+      y: this.expandedMapView.centerY + (canvasY - canvas.height * 0.5) / scale,
+      scale,
+    };
+  }
+
+  #onExpandedMapTap({ canvasX, canvasY }) {
+    if (!this.hud.isExpandedMapOpen() || !this.cityMap) return;
+    const { x, y, scale } = this.#expandedCanvasToWorld(canvasX, canvasY);
+    // 1) ¿tocó cerca del ícono de una misión secundaria?
+    let best = null;
+    for (const pin of this.#sidePins()) {
+      const d = Math.hypot(pin.x - x, pin.y - y) * scale;
+      if (d < 30 && (!best || d < best.d)) best = { pin, d };
+    }
+    if (best) {
+      const sp = this.cityMap.resolveLocationCode(best.pin.code).spawnPoint;
+      this.setWaypoint({ code: best.pin.code, x: sp.x, y: sp.y, name: best.pin.name });
+      return;
+    }
+    // 2) lugar del mapa (edificio, plaza o calle)
+    const loc = this.cityMap.getLocationAt(x, y);
+    if (!loc) { this.hud.showToast('Tocá una calle, una plaza o un edificio para marcar el destino.'); return; }
+    const name = this.locationNames?.get(loc.code) || loc.code;
+    if (loc.type === 'road') {
+      const b = loc.bounds;
+      const px = loc.axis === 'h' ? x : b.x + b.w * 0.5;
+      const py = loc.axis === 'h' ? b.y + b.h * 0.5 : y;
+      this.setWaypoint({ code: loc.code, x: px, y: py, name });
+      return;
+    }
+    const sp = loc.spawnPoint || { x, y };
+    this.setWaypoint({ code: loc.code, x: sp.x, y: sp.y, name });
+  }
+
+  setWaypoint(wp) {
+    this.waypoint = wp;
+    this.waypointTimer = 0;
+    this.waypointRoute = this.pathfinder.findRouteToPoint(this.player.x, this.player.y, wp.x, wp.y);
+    this.hud.setWaypointBar?.(wp);
+    if (this.hud.isExpandedMapOpen()) this.#renderExpandedMap();
+  }
+
+  clearWaypoint() {
+    this.waypoint = null;
+    this.waypointRoute = [];
+    this.hud.setWaypointBar?.(null);
+    if (this.hud.isExpandedMapOpen()) this.#renderExpandedMap();
+  }
+
+  #rideToWaypoint() {
+    const wp = this.waypoint;
+    if (!wp || this.rideInProgress || this.player.isDead || this.deathSequence || this.cutscene?.active) return;
+    this.rideInProgress = true;
+    if (this.hud.isExpandedMapOpen()) this.closeExpandedMap();
+    this.paused = true;
+    this.hud.showRideOverlay?.(wp.name);
+    setTimeout(() => {
+      const vehicle = this.player.inVehicleId ? this.vehicles.find((v) => v.id === this.player.inVehicleId) : null;
+      if (vehicle) {
+        vehicle.driver = null;
+        vehicle.speed = 0;
+        vehicle.vx = 0;
+        vehicle.vy = 0;
+        this.player.inVehicleId = null;
+        this.input.setDrivingMode(false);
+      }
+      this.player.x = wp.x;
+      this.player.y = wp.y;
+      this.player.speed = 0;
+      this.player.exitingVehicle = null;
+      this.player.insideLocationCode = null;
+      this.camera.x = this.player.x;
+      this.camera.y = this.player.y;
+      this.#syncActiveChunks(this.player.x, this.player.y);
+      if (this.objectiveCode) this.routePoints = this.pathfinder.findRoute(this.player.x, this.player.y, this.objectiveCode);
+      this.clearWaypoint();
+      this.hud.hideRideOverlay?.();
+      this.paused = false;
+      this.rideInProgress = false;
+      this.hud.showToast(`🚕 Llegaste a ${wp.name}. ¡Gracias por viajar en Ubyte!`);
+      this.#persistSaveState();
+    }, 1700);
+  }
+
   #findNearbyEncounterNpc() {
     if (this.player.inVehicleId || !this.player.insideLocationCode) return null;
     for (const npc of this.encounterNpcs) {
@@ -1099,6 +1230,7 @@ export class Engine {
   }
 
   #renderExpandedMap() {
+    this.#syncMapOverlay();
     this.minimap.renderExpanded(
       this.hud.expandedMapCanvas,
       this.cityMap,
@@ -1973,6 +2105,17 @@ export class Engine {
       }
     }
 
+    if (this.waypoint) {
+      this.waypointTimer += dt;
+      if (Math.hypot(this.player.x - this.waypoint.x, this.player.y - this.waypoint.y) < 150) {
+        this.hud.showToast(`📍 Llegaste a ${this.waypoint.name}.`);
+        this.clearWaypoint();
+      } else if (this.waypointTimer >= 0.4) {
+        this.waypointTimer = 0;
+        this.waypointRoute = this.pathfinder.findRouteToPoint(this.player.x, this.player.y, this.waypoint.x, this.waypoint.y);
+      }
+    }
+
     this.routeTimer += dt;
     if (this.objectiveCode && this.routeTimer >= 0.25) {
       this.routeTimer = 0;
@@ -2264,6 +2407,7 @@ export class Engine {
         : 0;
       return this.#worldToScreen(bubblePed.x + avoidX, bubblePed.y - 22);
     });
+    this.#syncMapOverlay();
     this.minimap.render(
       this.cityMap,
       this.player,

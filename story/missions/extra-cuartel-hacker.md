@@ -1,7 +1,7 @@
 ---
 id: extra-cuartel-hacker
 npc: nube
-location: CASA-63
+location: CASA-13
 prompt: Entrar al Cuartel del Hacker (práctica libre de SQL)
 roof_color: #1f6feb
 roof_logo: assets/logo-sql.svg

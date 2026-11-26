@@ -4,10 +4,10 @@ import { CityMap } from '../src/world/city-map.js';
 import { TrafficManager } from '../src/world/traffic-manager.js';
 import { Minimap } from '../src/ui/minimap.js';
 
-test('gera cidade-base 30x30 com códigos únicos de ruas, casas, comércios e praças', () => {
+test('gera cidade-base 16x16 com códigos únicos de ruas, casas, comércios e praças', () => {
   const map = new CityMap();
-  assert.equal(map.blocks.length, 30);
-  assert.equal(map.blocks[0].length, 30);
+  assert.equal(map.blocks.length, 16);
+  assert.equal(map.blocks[0].length, 16);
 
   const rua1 = map.resolveLocationCode('RUA-01');
   const casa1 = map.resolveLocationCode('CASA-01');
@@ -64,9 +64,9 @@ test('gera hospitais espalhados pela cidade com telhado branco e interior acess�
     }
   }
 
-  assert.equal(hospitals.length, 40);
+  assert.equal(hospitals.length, 12);
   const hosp1 = map.resolveLocationCode('HOSP-01');
-  const hosp40 = map.resolveLocationCode('HOSP-40');
+  const hosp40 = map.resolveLocationCode('HOSP-12');
   assert.equal(hosp40.type, 'hospital');
   assert.equal(hosp1.type, 'hospital');
   assert.equal(hosp1.roofColor, '#ffffff');
@@ -80,7 +80,7 @@ test('gera hospitais espalhados pela cidade com telhado branco e interior acess�
   assert.equal(detected?.type, 'hospital');
 
   // Garante que locais usados pelas missões continuam válidos
-  for (const code of ['CASA-01', 'COM-01', 'COM-24', 'COM-320', 'CASA-353', 'COM-554', 'CASA-656']) {
+  for (const code of ['CASA-01', 'COM-01', 'COM-14', 'COM-96', 'CASA-84', 'COM-182', 'CASA-181']) {
     assert.ok(map.resolveLocationCode(code));
   }
 });
@@ -95,11 +95,11 @@ test('resolveItemLocation posiciona itens em praças, interiores e esquinas entr
   assert.equal(interiorPt.kind, 'interior');
   assert.equal(interiorPt.code, 'HOSP-05');
 
-  const cornerPt = map.resolveItemLocation('RUA-04 x RUA-36 NE');
+  const cornerPt = map.resolveItemLocation('RUA-04 x RUA-20 NE');
   assert.equal(cornerPt.kind, 'corner');
   const cornerLoc = map.getLocationAt(cornerPt.x, cornerPt.y);
   assert.equal(cornerLoc?.type, 'road');
-  assert.ok(['RUA-04', 'RUA-36'].includes(cornerLoc?.code));
+  assert.ok(['RUA-04', 'RUA-20'].includes(cornerLoc?.code));
 });
 
 test('getLocationAt identifica a rua correspondente quando o jogador está na calçada', () => {
@@ -146,7 +146,7 @@ test('resolveItemLocation posiciona item interno perto da parede oposta à porta
 
 test('divide a cidade em chunks ativos com cerca de 2 veículos variados por quarteirão dirigidos por NPCs', () => {
   const map = new CityMap();
-  assert.equal(map.chunkCols * map.chunkRows, 100);
+  assert.equal(map.chunkCols * map.chunkRows, Math.ceil(map.gridBlocks / map.chunkBlockSize) ** 2);
   assert.equal(map.vehicleSpawns.length, map.gridBlocks * map.gridBlocks * 2);
   assert.ok(map.vehicleSpawns.every((v) => v.driver === 'npc' && v.isParked === false));
 
@@ -173,7 +173,7 @@ test('divide a cidade em chunks ativos com cerca de 2 veículos variados por qua
   assert.ok(traffic.pedestrians.length > 0);
 
   // Ao mover para um chunk distante, os pedestres antigos fora da vizinhança são removidos
-  const farCorner = map.resolveLocationCode('CASA-656');
+  const farCorner = map.resolveLocationCode('CASA-181');
   const farChunks = map.getActiveChunks(
     farCorner.spawnPoint.x - 10,
     farCorner.spawnPoint.y - 10,
@@ -231,11 +231,11 @@ test('getSurfaceAt diferencia asfalto, calçada e grama', () => {
   assert.equal(map.getSurfaceAt(pb.x + pb.w * 0.5, pb.y + pb.h * 0.5), 'grass');
 });
 
-test('resolveIndoorOppositePosition posiciona NPC na parede oposta à porta da CASA-63', () => {
+test('resolveIndoorOppositePosition posiciona NPC na parede oposta à porta de uma casa com porta ao sul', () => {
   const map = new CityMap();
-  const pos = map.resolveIndoorOppositePosition('CASA-63');
+  const pos = map.resolveIndoorOppositePosition('CASA-01');
   const b = pos.building.bounds;
-  assert.equal(pos.building.code, 'CASA-63');
+  assert.equal(pos.building.code, 'CASA-01');
   assert.equal(pos.building.doorSide, 'south');
   assert.ok(pos.y < b.y + b.h * 0.5, 'NPC deve ficar na metade norte (oposta à porta sul)');
   assert.ok(pos.x >= b.x && pos.x <= b.x + b.w);

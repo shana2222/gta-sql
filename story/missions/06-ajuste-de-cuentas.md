@@ -1,11 +1,11 @@
 ---
 id: 06-ajuste-de-cuentas
 title: Misión 6 — Ajuste de cuentas
-start: CASA-656
-pickup: PRACA-10
-pickup_objective: Buscá la Foto de la Redada en PRACA-10
-target: COM-24
-objective: Llevale la foto a Rayo en el Garaje Fénix (COM-24)
+start: CASA-181
+pickup: PRACA-07
+pickup_objective: Buscá la Foto de la Redada en PRACA-07
+target: COM-14
+objective: Llevale la foto a Rayo en el Garaje Fénix (COM-14)
 give_item: foto-redada
 require_item: foto-redada
 delivery_prompt: Rayo quiere ver la foto. Elegí el objeto:
@@ -19,10 +19,10 @@ bg: Depósito del Puerto
 
 - Pepe: Te dije que venía la redada. La policía atrapó a Kobra, el jefe de Los Halcones.
 - Byte: Entonces Kobra ya no está en la calle. Hay que sacarlo de la base, a él y a su auto.
-- Pepe: Hay más. Alguien sacó una foto de la redada, quedó en la PRACA-10. Y en la foto se ve una pickup marrón… la de Rayo.
+- Pepe: Hay más. Alguien sacó una foto de la redada, quedó en la PRACA-07. Y en la foto se ve una pickup marrón… la de Rayo.
 - OPCAO: ¿Cómo sabés todo eso? -> NEXT
 - OPCAO: ¿Cuánto me cobrás por este dato? -> NEXT
-- Pepe: Este va de regalo. Saber cosas es mi trabajo. Rayo está en su garaje, COM-24.
+- Pepe: Este va de regalo. Saber cosas es mi trabajo. Rayo está en su garaje, COM-14.
 
 ## CUTSCENE_FIM
 left: byte

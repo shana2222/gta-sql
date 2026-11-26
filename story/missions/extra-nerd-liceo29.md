@@ -1,7 +1,7 @@
 ---
 id: extra-nerd-liceo29
 npc: ada
-location: COM-498
+location: COM-155
 prompt: Entrar al Liceo 29 (misión nerd)
 roof_color: #9b2c2c
 roof_logo: assets/logo-liceo29.svg

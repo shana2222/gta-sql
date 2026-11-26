@@ -60,7 +60,7 @@ test('carrega e valida o pacote de história de exemplo completo contra a cidade
     cityMap
   );
   assert.equal(m1.startLocation, 'CASA-01');
-  assert.equal(m1.targetLocation, 'COM-320');
+  assert.equal(m1.targetLocation, 'COM-96');
   assert.ok(m1.introCutscene.steps.length >= 2);
   const choiceStep = m1.introCutscene.steps.find((s) => s.choices?.length);
   assert.ok(choiceStep);
@@ -153,9 +153,9 @@ test('map/map.md mapeia todos os locais da cidade e substitui códigos em falas 
   const locationNames = parseMapMarkdown(mapRaw, 'map/map.md');
 
   assert.equal(locationNames.get('CASA-01'), 'Guarida de la Familia Ceibo');
-  assert.equal(locationNames.get('RUA-18'), 'Av. 18 de Julio');
-  assert.equal(locationNames.get('RUA-31'), 'Rambla Sur');
-  assert.equal(locationNames.get('COM-320'), 'Taller de Chispa');
+  assert.equal(locationNames.get('RUA-11'), 'Av. 18 de Julio');
+  assert.equal(locationNames.get('RUA-17'), 'Rambla Sur');
+  assert.equal(locationNames.get('COM-96'), 'Taller de Chispa');
 
   for (const code of cityMap.locationsByCode.keys()) {
     assert.ok(locationNames.has(code), `Código ausente em map/map.md: ${code}`);
@@ -165,7 +165,7 @@ test('map/map.md mapeia todos os locais da cidade e substitui códigos em falas 
   const speech = 'llevá esto a la CASA-01 por la RUA-02';
   assert.equal(
     replaceLocationCodesWithNames(speech, locationNames),
-    'llevá esto a la Guarida de la Familia Ceibo por la Av. Millán'
+    'llevá esto a la Guarida de la Familia Ceibo por la Av. Gral. Flores'
   );
 });
 
@@ -497,12 +497,12 @@ test('parseEncounterMarkdown lê encontro extra em construção e rejeita local 
 
   assert.equal(encounter.id, 'extra-cuartel-hacker');
   assert.ok(encounter.npc);
-  assert.equal(encounter.location, 'CASA-63');
+  assert.equal(encounter.location, 'CASA-13');
   assert.match(encounter.roofColor, /^#(?:[0-9a-fA-F]{3}|[0-9a-fA-F]{6})$/);
   assert.ok(encounter.cutscene.steps.length >= 2);
 
   const defaultEncounter = parseEncounterMarkdown(
-    `---\nid: def\nnpc: maltmon\nlocation: CASA-63\n---\n## CUTSCENE\n- maltmon: Oi\n`,
+    `---\nid: def\nnpc: maltmon\nlocation: CASA-13\n---\n## CUTSCENE\n- maltmon: Oi\n`,
     'def.md',
     map,
   );
@@ -510,7 +510,7 @@ test('parseEncounterMarkdown lê encontro extra em construção e rejeita local 
   assert.equal(defaultEncounter.roofLogo, '');
 
   const customEncounter = parseEncounterMarkdown(
-    `---\nid: custom\nnpc: maltmon\nlocation: CASA-63\nroof_color: #2563eb\nroof_logo: assets/alex-front.svg\n---\n## CUTSCENE\n- maltmon: Oi\n`,
+    `---\nid: custom\nnpc: maltmon\nlocation: CASA-13\nroof_color: #2563eb\nroof_logo: assets/alex-front.svg\n---\n## CUTSCENE\n- maltmon: Oi\n`,
     'custom.md',
     map,
   );
@@ -520,7 +520,7 @@ test('parseEncounterMarkdown lê encontro extra em construção e rejeita local 
   assert.throws(
     () =>
       parseEncounterMarkdown(
-        `---\nid: badcolor\nnpc: maltmon\nlocation: CASA-63\nroof_color: azul\n---\n## CUTSCENE\n- maltmon: Oi\n`,
+        `---\nid: badcolor\nnpc: maltmon\nlocation: CASA-13\nroof_color: azul\n---\n## CUTSCENE\n- maltmon: Oi\n`,
         'badcolor.md',
         map,
       ),

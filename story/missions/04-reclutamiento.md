@@ -2,10 +2,10 @@
 id: 04-reclutamiento
 title: Misión 4 — Reclutamiento
 start: CASA-01
-pickup: PRACA-25
-pickup_objective: Buscá el Expediente de Inteligencia en PRACA-25
-target: COM-320
-objective: Llevale el expediente a Chispa en COM-320
+pickup: PRACA-13
+pickup_objective: Buscá el Expediente de Inteligencia en PRACA-13
+target: COM-96
+objective: Llevale el expediente a Chispa en COM-96
 give_item: expediente
 require_item: expediente
 delivery_prompt: Chispa necesita el expediente para cargar los datos. Elegí el objeto:
@@ -19,7 +19,7 @@ bg: Guarida de la Familia Ceibo
 
 - Vera: La estructura está lista. Pero una base sin datos es un garaje sin autos.
 - Byte: Ahora toca DML: el lenguaje que maneja los datos. Insertar filas, cambiarlas y borrarlas.
-- Vera: Un informante dejó un expediente en la PRACA-25: las bandas de la ciudad, sus miembros y sus autos.
+- Vera: Un informante dejó un expediente en la PRACA-13: las bandas de la ciudad, sus miembros y sus autos.
 - Vera: Y otra cosa. Te ganaste un lugar. Desde hoy sos parte de la Familia Ceibo. Anotate vos también.
 - OPCAO: ¡Gracias, jefa! -> NEXT
 - OPCAO: ¿Con cuánto respeto arranco? -> NEXT

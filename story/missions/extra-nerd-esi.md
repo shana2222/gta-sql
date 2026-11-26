@@ -1,7 +1,7 @@
 ---
 id: extra-nerd-esi
 npc: kernel
-location: COM-375
+location: COM-111
 prompt: Entrar a la ESI (misión nerd)
 roof_color: #1f2328
 roof_logo: assets/logo-esi.svg

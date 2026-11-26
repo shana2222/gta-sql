@@ -1,4 +1,4 @@
-export const GRID_BLOCKS = 30;
+export const GRID_BLOCKS = 16;
 export const ROAD_WIDTH = 124;
 export const SIDEWALK_WIDTH = 26;
 

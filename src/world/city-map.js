@@ -7,7 +7,7 @@ import {
   createBuildingWithInterior,
   formatCode,
   hashBlock
-} from './city-layout.js?v=21';
+} from './city-layout.js?v=22';
 
 export const CHUNK_BLOCK_SIZE = 3;
 
@@ -98,7 +98,7 @@ export class CityMap {
         const bw = this.colWidths[bx];
         const bh = this.rowHeights[by];
         const seed = hashBlock(bx, by);
-        const isPlaza = bx % 5 === 2 && by % 5 === 2;
+        const isPlaza = bx % 4 === 1 && by % 4 === 1;
 
         const block = {
           bx,
@@ -280,12 +280,15 @@ export class CityMap {
   #placeHospitals() {
     const protectedCodes = new Set([
       'CASA-01', 'CASA-02', 'COM-01', 'COM-24',
-      'COM-320', 'CASA-353', 'COM-554', 'CASA-656'
+      'COM-320', 'CASA-353', 'COM-554', 'CASA-656',
+      // lugares de la historia GTA SQL (ciudad 16x16)
+      'CASA-84', 'CASA-181', 'CASA-19', 'CASA-13', 'COM-14', 'COM-96', 'COM-182', 'COM-35', 'COM-55',
+      'COM-10', 'COM-66', 'COM-84', 'COM-111', 'COM-116', 'COM-155', 'COM-209', 'COM-136', 'COM-124'
     ]);
     const offsets = [[0, 0], [1, 0], [-1, 0], [0, 1], [0, -1], [1, 1], [-1, -1]];
     const usedBlocks = new Set();
-    const cols = 8;
-    const rows = 5;
+    const cols = Math.max(2, Math.round((8 * this.gridBlocks) / 30));
+    const rows = Math.max(2, Math.round((5 * this.gridBlocks) / 30));
     let hospIdx = 1;
 
     for (let row = 0; row < rows; row++) {

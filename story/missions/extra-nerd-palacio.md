@@ -1,7 +1,7 @@
 ---
 id: extra-nerd-palacio
 npc: delia
-location: COM-185
+location: COM-66
 prompt: Entrar al Palacio Legislativo (misión nerd)
 roof_color: #1f3a5f
 roof_logo: assets/logo-palacio.svg

@@ -38,7 +38,12 @@ export class RoadPathfinder {
     }
 
     const target = this.cityMap.resolveLocationCode(targetCode);
-    const goalPos = target.spawnPoint;
+    return this.findRouteToPoint(fromX, fromY, target.spawnPoint.x, target.spawnPoint.y);
+  }
+
+  /** Ruta por las calles hasta un punto cualquiera del mundo (destino marcado en el mapa). */
+  findRouteToPoint(fromX, fromY, goalX, goalY) {
+    const goalPos = { x: goalX, y: goalY };
     const start = this.nearestNode(fromX, fromY);
     const goal = this.nearestNode(goalPos.x, goalPos.y);
 

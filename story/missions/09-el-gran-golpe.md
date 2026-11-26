@@ -1,11 +1,11 @@
 ---
 id: 09-el-gran-golpe
 title: Misión 9 — El gran golpe
-start: CASA-353
-pickup: PRACA-30
-pickup_objective: Buscá el Plano del Casino en PRACA-30
-target: COM-554
-objective: Llevale el plano a Vera en el Casino Bruma (COM-554)
+start: CASA-84
+pickup: PRACA-15
+pickup_objective: Buscá el Plano del Casino en PRACA-15
+target: COM-182
+objective: Llevale el plano a Vera en el Casino Bruma (COM-182)
 give_item: plano-casino
 require_item: plano-casino
 delivery_prompt: Vera espera el plano. Elegí el objeto:
@@ -23,7 +23,7 @@ bg: Escondite de la Colina
 - Byte: Funciones de agregado: COUNT cuenta, SUM suma. Y GROUP BY arma grupos, uno por banda.
 - OPCAO: ¿Dónde está el plano? -> NEXT
 - OPCAO: ¿Estás listo para confesar? -> NEXT
-- Chispa: El plano está en la PRACA-30. Te espero en el casino, COM-554. Con la jefa. Y con la verdad.
+- Chispa: El plano está en la PRACA-15. Te espero en el casino, COM-182. Con la jefa. Y con la verdad.
 
 ## CUTSCENE_FIM
 left: byte

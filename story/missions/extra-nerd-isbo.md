@@ -1,7 +1,7 @@
 ---
 id: extra-nerd-isbo
 npc: pixel
-location: COM-142
+location: COM-55
 prompt: Entrar al ISBO (misión nerd)
 roof_color: #7a1f9b
 roof_logo: assets/logo-isbo.svg

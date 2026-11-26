@@ -1,7 +1,7 @@
 ---
 id: extra-nerd-iti
 npc: ohm
-location: COM-380
+location: COM-116
 prompt: Entrar al ITI (misión nerd)
 roof_color: #1f6feb
 roof_logo: assets/logo-iti.svg

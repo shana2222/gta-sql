@@ -1,11 +1,11 @@
 ---
 id: 02-garaje-y-golpes
 title: Misión 2 — El garaje y los golpes
-start: COM-320
-pickup: PRACA-05
-pickup_objective: Buscá la Llave del Garaje en PRACA-05
-target: COM-24
-objective: Llevale la llave a Rayo en el Garaje Fénix (COM-24)
+start: COM-96
+pickup: PRACA-04
+pickup_objective: Buscá la Llave del Garaje en PRACA-04
+target: COM-14
+objective: Llevale la llave a Rayo en el Garaje Fénix (COM-14)
 give_item: llave-garaje
 require_item: llave-garaje
 delivery_prompt: Rayo no puede entrar a su garaje. Elegí el objeto:
@@ -24,7 +24,7 @@ bg: Taller de Chispa
 - Chispa: Rayo tiene la otra computadora, en su garaje. Pero perdió la llave. Otra vez.
 - OPCAO: ¿Dónde la perdió? -> NEXT
 - OPCAO: ¿Cuántas veces la perdió este mes? -> NEXT
-- Chispa: Dice que se le cayó en la PRACA-05 persiguiendo un helado. Llevásela al Garaje Fénix, en COM-24.
+- Chispa: Dice que se le cayó en la PRACA-04 persiguiendo un helado. Llevásela al Garaje Fénix, en COM-14.
 
 ## CUTSCENE_FIM
 left: byte

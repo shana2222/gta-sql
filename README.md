@@ -50,6 +50,13 @@ En el Palacio Legislativo hay una placa de homenaje a José "Pepe" Mujica, con d
 
 ### La ciudad
 
+La ciudad tiene **16 × 16 manzanas**. En el mapa grande (tecla **M** o tocando el minimapa):
+
+- Los **⭐ íconos** marcan las misiones secundarias (Cuartel del Hacker y centros nerds). Cuando un centro está completo, aparece con **✔** verde.
+- **Tocando el mapa** se marca un **📍 destino**: el juego traza la ruta en violeta (también en el minimapa).
+- Con **🚕 Pedir un Ubyte** el personaje viaja directo al destino. Si iba manejando, su auto queda estacionado donde estaba.
+
+
 Los nombres siguen, de forma aproximada, el plano de Montevideo: la **Rambla** rodea la ciudad sobre el agua (Rambla Sur, Rambla Portuaria, Rambla Gran Bretaña, Rambla República de México), **Av. 18 de Julio** es la avenida principal, al norte corren Colonia, Mercedes, Uruguay, Paysandú…, al sur San José, Soriano, Canelones, Maldonado…, y de oeste a este se pasa de la Ciudad Vieja (Pérez Castellano, Ituzaingó) a Florida, Río Negro, Andes, Ejido, Tacuarembó y Bv. Artigas. La Plaza Independencia, el Palacio Salvo y la Torre Ejecutiva están juntos, sobre 18 de Julio.
 
 El modelo de datos es el mismo de la evaluación (BANDA, MIEMBRO, VEHICULO, MISION, PARTICIPA_MISION), con datos distintos.

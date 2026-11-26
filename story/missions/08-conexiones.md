@@ -2,10 +2,10 @@
 id: 08-conexiones
 title: Misión 8 — Conexiones
 start: CASA-01
-pickup: PRACA-20
-pickup_objective: Buscá el Mapa de Conexiones en PRACA-20
-target: CASA-353
-objective: Llevale el mapa a Chispa en el Escondite de la Colina (CASA-353)
+pickup: PRACA-10
+pickup_objective: Buscá el Mapa de Conexiones en PRACA-10
+target: CASA-84
+objective: Llevale el mapa a Chispa en el Escondite de la Colina (CASA-84)
 give_item: mapa-conexiones
 require_item: mapa-conexiones
 delivery_prompt: Chispa espera el mapa. Elegí el objeto:
@@ -19,10 +19,10 @@ bg: Guarida de la Familia Ceibo
 
 - Vera: Los datos están separados en tablas. El alias en una, el nombre de la banda en otra. Yo quiero verlos juntos.
 - Byte: Para eso se usa JOIN: une filas de dos tablas usando la columna que tienen en común.
-- Vera: Chispa armó un mapa con hilos rojos que conecta a todos. Quedó en la PRACA-20.
+- Vera: Chispa armó un mapa con hilos rojos que conecta a todos. Quedó en la PRACA-10.
 - OPCAO: Hilos rojos… muy de película de detectives. -> NEXT
 - OPCAO: Lo busco. -> NEXT
-- Vera: Llevalo al escondite de la colina, CASA-353. Chispa se mudó ahí. Dice que el taller… tiene corriente de aire.
+- Vera: Llevalo al escondite de la colina, CASA-84. Chispa se mudó ahí. Dice que el taller… tiene corriente de aire.
 
 ## CUTSCENE_FIM
 left: byte
