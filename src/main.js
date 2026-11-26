@@ -1,4 +1,4 @@
-import { Engine } from './core/engine.js?v=60';
+import { Engine } from './core/engine.js?v=61';
 import { HudController } from './ui/hud-controller.js?v=42';
 import { CutsceneController } from './ui/cutscene-controller.js?v=15';
 import { PauseMenuController } from './ui/pause-menu.js?v=6';

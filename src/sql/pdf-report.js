@@ -184,6 +184,9 @@ export async function downloadProgressPdf({ student, progress, PHASES, MISSIONS,
   if (!won.length) para('Todavía no ganó insignias.', { col: C.muted });
   else para(won.map((b) => `${b.name}${b.group === 'Misiones' ? ` (${b.title})` : ''}`).join(' · '), { col: C.green });
 
+  const street = progress.street || {};
+  para(`Mini retos de la calle: ${Object.keys(street.solved || {}).length} distintos resueltos · ${street.helped || 0} ayudas en total · ${Object.values(street.solved || {}).filter((x) => x.firstTry).length} al primer intento.`, { col: C.ink });
+
   // ---------- historial ----------
   const historial = [...progress.entregas, entrega];
   section('Historial de entregas');

@@ -798,7 +798,7 @@ export class WebGLRenderer {
         !player.inVehicleId && pt.location && player.insideLocationCode === pt.location,
       );
       this.#drawStoryNpc(pt.x, pt.y, time, isPlayerInsideEncounter);
-      if (isPlayerInsideEncounter) {
+      if (isPlayerInsideEncounter || pt.streetEvent) {
         this.#drawNpcWaves(pt.x, pt.y, time);
       }
     }

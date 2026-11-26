@@ -253,6 +253,24 @@ export class Minimap {
       }
     }
 
+    // Persona que pide ayuda en la calle (mini reto)
+    if (overlay.streetEvent) {
+      let ex = toMiniX(overlay.streetEvent.x); let ey = toMiniY(overlay.streetEvent.y);
+      const pad = 9;
+      if (!expanded && (ex < pad || ex > w - pad || ey < pad || ey > h - pad)) {
+        const cx = w * 0.5; const cy = h * 0.5; const dx = ex - cx; const dy = ey - cy;
+        const k = Math.max(Math.abs(dx) / Math.max(1, cx - pad), Math.abs(dy) / Math.max(1, cy - pad), 1);
+        ex = cx + dx / k; ey = cy + dy / k;
+      }
+      const r = expanded ? 13 : 7;
+      ctx.save();
+      ctx.fillStyle = '#ef4444'; ctx.strokeStyle = '#ffffff'; ctx.lineWidth = expanded ? 3 : 2;
+      ctx.beginPath(); ctx.arc(ex, ey, r, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+      ctx.fillStyle = '#ffffff'; ctx.font = `900 ${expanded ? 16 : 10}px system-ui, sans-serif`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+      ctx.fillText('!', ex, ey + 0.5);
+      ctx.restore();
+    }
+
     // Destino marcado por el jugador
     if (overlay.waypoint) {
       const rawX = toMiniX(overlay.waypoint.x);

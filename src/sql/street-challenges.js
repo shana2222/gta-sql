@@ -1,0 +1,148 @@
+// Mini retos que aparecen al azar en la calle (bonus: no cambian la nota).
+// type 'choice': elegir una opción · type 'fill': escribir lo que falta.
+
+export const STREET_CHALLENGES = [
+  {
+    id: 'anciana', icon: '👵', who: 'Doña Rosa', cry: '¡Ayuda! ¿Me cruzás la calle?',
+    story: 'Doña Rosa quiere cruzar 18 de Julio. Su bastón inteligente decide con este código cuándo es seguro cruzar.',
+    code: 'if (semaforo == "verde" ___ autosCerca == 0) {\n  cruzar();\n}',
+    question: '¿Qué operador va en el espacio para que cruce solo si se cumplen LAS DOS condiciones?',
+    type: 'choice', options: ['&&', '||', '!', '='], answer: 0,
+    explain: '&& (Y) exige que las dos condiciones sean verdaderas. Con || (O) alcanzaría con una sola… ¡y Doña Rosa cruzaría con autos viniendo!',
+    thanks: '¡Gracias, m’hija! Ahora sí cruzo tranquila. Tomá, un caramelo de miel.',
+  },
+  {
+    id: 'bucle', icon: '🧑‍💻', who: 'Mateo, programador junior', cry: '¡Mi programa no termina nunca!',
+    story: 'Mateo hace su primera práctica y la computadora se trancó. Lleva diez minutos imprimiendo ceros.',
+    code: 'let i = 0;\nwhile (i < 5) {\n  console.log(i);\n}',
+    question: '¿Qué le falta al bucle para que termine?',
+    type: 'choice', options: ['Agregar i++ dentro del bucle', 'Cambiar < por <=', 'Poner let i = 5 al principio', 'Borrar el console.log'], answer: 0,
+    explain: 'Si i nunca cambia, la condición i < 5 es siempre verdadera: bucle infinito. Con i++ el contador avanza y en algún momento llega a 5.',
+    thanks: '¡Se detuvo en 4! Pensé que había roto la ceibalita.',
+  },
+  {
+    id: 'java-pyc', icon: '☕', who: 'Lucas, estudiante de Java', cry: '¡Java me grita en rojo!',
+    story: 'Lucas compila su primer programa en Java y el compilador le muestra: error: \';\' expected',
+    code: 'public class Hola {\n  public static void main(String[] args) {\n    System.out.println("Hola Santa Bruma")\n  }\n}',
+    question: '¿Qué carácter falta al final de la línea del println? Escribilo:',
+    type: 'fill', accept: [';'],
+    explain: 'En Java cada instrucción termina con punto y coma (;). El error \';\' expected te dice justo eso.',
+    thanks: '¡Compiló! Un punto y coma… tres horas por un punto y coma.',
+  },
+  {
+    id: 'python-indent', icon: '🐍', who: 'Sofi', cry: '¡Python me dice IndentationError!',
+    story: 'Sofi quiere mostrar los nombres de su lista de amigos, pero Python no la deja.',
+    code: 'amigos = ["Ana", "Leo", "Uma"]\nfor nombre in amigos:\nprint(nombre)',
+    question: '¿Cómo se arregla?',
+    type: 'choice', options: ['Dejar 4 espacios antes de print(nombre)', 'Agregar ; al final del for', 'Cambiar for por while', 'Poner print entre llaves { }'], answer: 0,
+    explain: 'En Python, lo que va adentro de un for se marca con sangría (normalmente 4 espacios). Sin sangría, Python no sabe qué repetir.',
+    thanks: '¡Ana, Leo y Uma! Python es estricto pero justo.',
+  },
+  {
+    id: 'firulais', icon: '🐕', who: 'Martina', cry: '¡Perdí a mi perro Firulais!',
+    story: 'Martina busca a Firulais en la base de la veterinaria del barrio, pero la consulta da: ERROR 1054: Unknown column \'Firulais\'',
+    code: 'SELECT * FROM perros WHERE nombre = Firulais;',
+    question: '¿Cuál es la consulta correcta?',
+    type: 'choice', options: ["SELECT * FROM perros WHERE nombre = 'Firulais';", 'SELECT * FROM perros WHERE nombre == Firulais;', 'SELECT Firulais FROM perros;', 'SELECT * FROM Firulais;'], answer: 0,
+    explain: 'Los textos van entre comillas simples. Sin comillas, MySQL cree que Firulais es el nombre de una columna.',
+    thanks: '¡Está en la veterinaria de la esquina! Gracias, gracias, ¡GRACIAS!',
+  },
+  {
+    id: 'delete', icon: '😱', who: 'El dueño del almacén', cry: '¡Esperá! ¿Esto borra todo?',
+    story: 'El almacenero quiere borrar solo al cliente número 7 y está por ejecutar esta sentencia…',
+    code: 'DELETE FROM clientes;',
+    question: '¿Qué sentencia debería ejecutar?',
+    type: 'choice', options: ['DELETE FROM clientes WHERE id = 7;', 'DROP TABLE clientes;', 'DELETE clientes 7;', 'TRUNCATE clientes WHERE id = 7;'], answer: 0,
+    explain: 'Sin WHERE, DELETE borra TODAS las filas. Con WHERE id = 7 se borra solo ese cliente. DROP TABLE borraría la tabla entera.',
+    thanks: '¡Casi borro a todo el barrio! Pasá cuando quieras, el mate corre por mi cuenta.',
+  },
+  {
+    id: 'igual', icon: '🎂', who: 'Bruno', cry: '¡Mi programa dice que todos tienen 18!',
+    story: 'Bruno hizo un programa para el cumpleaños de 15 de su hermana, pero dice que todos los invitados son mayores de edad.',
+    code: 'if (edad = 18) {\n  console.log("Es mayor de edad");\n}',
+    question: '¿Cuál es el error?',
+    type: 'choice', options: ['Usa = (asignar) en lugar de === (comparar)', 'Falta un punto y coma después del if', 'console.log está mal escrito', 'Las llaves sobran'], answer: 0,
+    explain: '= guarda un valor (asigna 18 a edad) y eso cuenta como verdadero. Para comparar se usa === (o == ).',
+    thanks: '¡Ahora sí! Y además pregunta "edad >= 18", que es más justo.',
+  },
+  {
+    id: 'off-by-one', icon: '📋', who: 'La adscripta del liceo', cry: '¡Me aparece un alumno undefined!',
+    story: 'La adscripta muestra las notas de la clase, pero al final aparece un alumno "undefined".',
+    code: 'for (let i = 0; i <= notas.length; i++) {\n  console.log(notas[i]);\n}',
+    question: '¿Qué hay que cambiar?',
+    type: 'choice', options: ['Cambiar <= por <', 'Empezar en i = 1', 'Cambiar i++ por i--', 'Cambiar notas.length por notas.length + 1'], answer: 0,
+    explain: 'Los arreglos empiezan en 0: si hay 30 notas, van de la 0 a la 29. Con <= se intenta leer la 30, que no existe.',
+    thanks: '¡Chau alumno fantasma! Muy bien, Byte.',
+  },
+  {
+    id: 'html-b', icon: '🌐', who: 'Pablo', cry: '¡Toda mi página quedó en negrita!',
+    story: 'Pablo arma la página web de su banda de rock y desde la segunda línea todo sale en negrita.',
+    code: '<p>Somos <b>Los Ceibos</b></p>\n<p>Tocamos el <b>sábado</p>\n<p>Entrada libre</p>',
+    question: '¿Qué etiqueta falta escribir después de la palabra sábado?',
+    type: 'fill', accept: ['</b>'],
+    explain: 'Cada etiqueta que se abre, se cierra. <b> abre la negrita y </b> la cierra.',
+    thanks: '¡Quedó joya! Te invito al toque del sábado.',
+  },
+  {
+    id: 'password', icon: '🔐', who: 'El barman del Bar La Rambla', cry: '¡Me hackearon el wifi del bar!',
+    story: 'Al barman le adivinaron la contraseña del wifi. Quiere poner una nueva y más segura.',
+    code: '',
+    question: '¿Cuál de estas contraseñas es la más segura?',
+    type: 'choice', options: ['Ceib0#Ramb1a!2027', '123456', 'barlarambla', 'rosa1950'], answer: 0,
+    explain: 'Una contraseña segura es larga y mezcla mayúsculas, minúsculas, números y símbolos. Nada de fechas ni palabras fáciles de adivinar.',
+    thanks: '¡Ahora sí! Nadie más se cuelga del wifi sin pedir un café.',
+  },
+  {
+    id: 'kiosco', icon: '🏪', who: 'Don Ramón del kiosco', cry: '¿Cuánto vendí hoy?',
+    story: 'Don Ramón guarda cada venta en una tabla y quiere saber el total del día.',
+    code: 'SELECT ___(precio) FROM ventas WHERE fecha = CURDATE();',
+    question: '¿Qué función va en el espacio para sumar todos los precios? Escribila:',
+    type: 'fill', accept: ['sum'],
+    explain: 'SUM suma los valores de una columna. COUNT contaría cuántas ventas hubo, no cuánta plata.',
+    thanks: '¡Mirá vos! Hoy vendí más alfajores que ayer.',
+  },
+  {
+    id: 'binario', icon: '📶', who: 'Una turista', cry: '¿Me ayudás con la clave del wifi?',
+    story: 'En el cartel del hostel dice: "La clave del wifi es el número 1010 en binario, pasado a decimal".',
+    code: '1010₂ = ?₁₀',
+    question: '¿Cuánto es 1010 (binario) en decimal? Escribí el número:',
+    type: 'fill', accept: ['10'],
+    explain: '1010 = 1×8 + 0×4 + 1×2 + 0×1 = 10.',
+    thanks: '¡Conectada! Ya le mando fotos de la Rambla a mi familia.',
+  },
+  {
+    id: 'vida', icon: '🎮', who: 'Joaco, gamer', cry: '¡Mi personaje tiene vida negativa!',
+    story: 'Joaco programa su videojuego. Su personaje tiene 100 de vida y recibe un golpe de 30.',
+    code: 'let vida = 100;\nvida -= 30;\nconsole.log(vida);',
+    question: '¿Qué número muestra el console.log? Escribilo:',
+    type: 'fill', accept: ['70'],
+    explain: 'vida -= 30 es lo mismo que vida = vida - 30. 100 - 30 = 70.',
+    thanks: '¡70! Entonces el problema está en otro lado… ¡gracias igual!',
+  },
+  {
+    id: 'str', icon: '🐍', who: 'Valen', cry: '¡Python me dice TypeError!',
+    story: 'Valen quiere presentarse con Python, pero aparece: TypeError: can only concatenate str (not "int") to str',
+    code: 'print("Tengo " + 15 + " años")',
+    question: '¿Cómo se arregla?',
+    type: 'choice', options: ['print("Tengo " + str(15) + " años")', 'print("Tengo " - 15 - " años")', 'print(Tengo + 15 + años)', 'print("Tengo " + int(15) + " años")'], answer: 0,
+    explain: 'No se puede "sumar" texto con un número. str(15) convierte el número en texto y así se pueden unir.',
+    thanks: '¡Tengo 15 años y ya sé convertir tipos!',
+  },
+  {
+    id: 'turista', icon: '🧭', who: 'Un turista con mapa', cry: 'Excuse me… ¿Plaza Independencia?',
+    story: 'Un turista quiere ir a la Plaza Independencia, donde empieza la Ciudad Vieja.',
+    code: '',
+    question: '¿Por qué avenida principal le conviene caminar para llegar?',
+    type: 'choice', options: ['Av. 18 de Julio', 'Rambla Sur', 'Bv. Artigas', 'Av. Italia'], answer: 0,
+    explain: 'La Plaza Independencia está en el extremo de Av. 18 de Julio, entre el Centro y la Ciudad Vieja. Tip: tocá el mapa (M) para marcar destinos.',
+    thanks: 'Thank you! ¡Muchas gracias!',
+  },
+];
+
+export function getStreetChallenge(id) {
+  return STREET_CHALLENGES.find((c) => c.id === id) || null;
+}
+
+export function normalizeAnswer(s) {
+  return String(s ?? '').trim().toLowerCase().replace(/\s+/g, '');
+}

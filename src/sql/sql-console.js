@@ -4,6 +4,7 @@ import { PHASES, MISSIONS, DB_NAME, phasesFor, rebuildState, BONUS, CENTERS, see
 import { renderGuide } from './guide.js';
 import { downloadProgressPdf } from './pdf-report.js';
 import { computeBadges, earnedIds } from './badges.js';
+import { STREET_CHALLENGES, getStreetChallenge, normalizeAnswer } from './street-challenges.js';
 
 const KEY_DB = 'gtasql.db.v1';
 const KEY_PROGRESS = 'gtasql.progress.v1';
@@ -664,6 +665,81 @@ async function resetAll() {
   if (ui && !ui.root.hidden) { renderLeft(); renderSchema(); }
 }
 
+/* ---------------- mini retos de la calle ---------------- */
+function streetState() {
+  progress.street = progress.street || { solved: {}, helped: 0 };
+  progress.street.solved = progress.street.solved || {};
+  return progress.street;
+}
+let lastStreetId = null;
+function nextStreetChallenge() {
+  const st = streetState();
+  const pending = STREET_CHALLENGES.filter((c) => !st.solved[c.id] && c.id !== lastStreetId);
+  const pool = pending.length ? pending : STREET_CHALLENGES.filter((c) => c.id !== lastStreetId);
+  const c = pool[Math.floor(Math.random() * pool.length)];
+  lastStreetId = c.id;
+  return { id: c.id, who: c.who, icon: c.icon, cry: c.cry };
+}
+
+function openStreetChallenge(id, { onClose } = {}) {
+  const c = getStreetChallenge(id);
+  if (!c) { onClose?.({ solved: false }); return; }
+  const st = streetState();
+  let tries = 0;
+  let solved = false;
+  const fb = h('p', { class: 'street-fb', role: 'status', 'aria-live': 'polite' });
+  const body = h('div', { class: 'street-body' });
+  const closeBtn = h('button', { type: 'button', class: 'sqlc-btn', onclick: () => finish() }, 'Ahora no');
+  const root = h('div', { class: 'street-root', role: 'dialog', 'aria-modal': 'true', 'aria-label': `Mini reto: ${c.who}` },
+    h('div', { class: 'street-card' },
+      h('div', { class: 'street-head' }, h('span', { class: 'street-icon', 'aria-hidden': 'true' }, c.icon), h('div', {}, h('div', { class: 'street-kicker' }, '❗ Mini reto de la calle'), h('h3', {}, c.who))),
+      h('p', { class: 'street-story' }, c.story),
+      c.code ? h('pre', { class: 'street-code' }, c.code) : null,
+      h('p', { class: 'street-q' }, c.question),
+      body, fb,
+      h('div', { class: 'street-actions' }, closeBtn)));
+  const check = (ok) => {
+    tries += 1;
+    if (ok) {
+      solved = true;
+      if (!st.solved[c.id]) st.solved[c.id] = { firstTry: tries === 1, at: new Date().toISOString() };
+      const before = earnedIds(progress);
+      st.helped = (st.helped || 0) + 1;
+      persist();
+      const nuevas = computeBadges(progress).filter((b) => b.earned && !before.has(b.id));
+      fb.className = 'street-fb ok';
+      fb.replaceChildren(h('b', {}, '✔ ¡Bien! '), c.explain, h('br'), h('span', { class: 'street-thanks' }, `${c.who}: "${c.thanks}"`));
+      body.querySelectorAll('button, input').forEach((el) => { el.disabled = true; });
+      closeBtn.textContent = 'Seguir jugando ▶';
+      closeBtn.className = 'sqlc-btn sqlc-btn-success';
+      closeBtn.focus();
+      nuevas.forEach((b, i) => setTimeout(() => showToast(`🏅 ¡Nueva insignia: ${b.icon} ${b.name}! Mirala en tu inventario.`), 600 + i * 2800));
+    } else {
+      fb.className = 'street-fb fail';
+      fb.replaceChildren(h('b', {}, '✖ Todavía no. '), tries === 1 ? 'Leé el código con calma y probá otra vez.' : c.explain);
+    }
+  };
+  if (c.type === 'fill') {
+    const input = h('input', { type: 'text', class: 'street-input', autocomplete: 'off', spellcheck: 'false', 'aria-label': 'Tu respuesta' });
+    const send = h('button', { type: 'button', class: 'sqlc-btn sqlc-btn-primary', onclick: () => check(c.accept.map(normalizeAnswer).includes(normalizeAnswer(input.value))) }, 'Responder');
+    input.addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); send.click(); } });
+    body.append(h('div', { class: 'street-fill' }, input, send));
+    setTimeout(() => input.focus(), 30);
+  } else {
+    const order = c.options.map((_, i) => i).sort(() => Math.random() - 0.5);
+    body.append(h('div', { class: 'street-options' }, order.map((i) => h('button', { type: 'button', class: 'street-opt', onclick: (e) => { if (i !== c.answer) e.currentTarget.classList.add('wrong'); else e.currentTarget.classList.add('right'); check(i === c.answer); } }, c.options[i]))));
+  }
+  function finish() {
+    root.remove();
+    setTimeout(() => { window.__sqlConsoleOpen = false; }, 120);
+    onClose?.({ solved });
+  }
+  root.addEventListener('keydown', (e) => { e.stopPropagation(); if (e.key === 'Escape') finish(); });
+  window.__sqlConsoleOpen = true;
+  mount(root);
+  applyTheme(root);
+}
+
 /* ---------------- insignias en el inventario ---------------- */
 function renderInventoryBadges() {
   const screen = document.getElementById('inventory-screen');
@@ -678,7 +754,7 @@ function renderInventoryBadges() {
   const list = computeBadges(progress);
   const got = list.filter((b) => b.earned).length;
   const info = h('p', { class: 'inv-badges-info', 'aria-live': 'polite' }, 'Tocá una insignia para ver cómo se gana.');
-  const groups = ['Misiones', 'Habilidades', 'Misiones nerds'].map((g) => h('div', { class: 'inv-badges-group' },
+  const groups = ['Misiones', 'Habilidades', 'Misiones nerds', 'Calle'].map((g) => h('div', { class: 'inv-badges-group' },
     h('span', { class: 'inv-badges-label' }, g),
     h('div', { class: 'inv-badges-row' }, list.filter((b) => b.group === g).map((b) => h('button', {
       type: 'button', class: `inv-badge${b.earned ? ' earned' : ''}`, title: `${b.name} — ${b.desc}`,
@@ -699,7 +775,7 @@ function watchInventory() {
 if (typeof document !== 'undefined') {
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', () => { buildFab(); watchInventory(); });
   else { buildFab(); watchInventory(); }
-  window.gtaSql = { openFreePractice, openSqlChallenge, getGrade, openReport, nerdDone: (center) => BONUS.filter((p) => p.center === center).every((p) => progress.completed[p.id]) && BONUS.some((p) => p.center === center) };
+  window.gtaSql = { openFreePractice, openSqlChallenge, getGrade, openReport, nextStreetChallenge, openStreetChallenge, nerdDone: (center) => BONUS.filter((p) => p.center === center).every((p) => progress.completed[p.id]) && BONUS.some((p) => p.center === center) };
 }
 
 export { splitStatements };

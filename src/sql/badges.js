@@ -1,5 +1,6 @@
 // Insignias que se ganan con el avance SQL (se muestran en el inventario y en el PDF).
 import { PHASES, MISSIONS, BONUS, CENTERS } from './challenges.js';
+import { STREET_CHALLENGES } from './street-challenges.js';
 
 const MISSION_ICONS = { 1: '📓', 2: '🔑', 3: '🛠️', 4: '🤝', 5: '📒', 6: '⚖️', 7: '📊', 8: '🧩', 9: '🎰' };
 const KIND = {
@@ -30,6 +31,11 @@ export function computeBadges(progress) {
     const d = ph.filter(done).length;
     list.push({ id: `nerd-${key}`, group: 'Misiones nerds', icon: c.icon, name: c.name, title: c.full, earned: d === ph.length && ph.length > 0, progress: `${d}/${ph.length}`, desc: d === ph.length ? `Completaste la misión nerd de ${c.full}.` : `Hablá con ${c.npc} en ${c.full} y resolvé sus ${ph.length} retos.` });
   }
+  const st = progress?.street || {};
+  const distinct = Object.keys(st.solved || {}).length;
+  const helped = st.helped || 0;
+  list.push({ id: 'calle-vecino', group: 'Calle', icon: '🤝', name: 'Buen vecino', title: 'Mini retos de la calle', earned: helped >= 5, progress: `${Math.min(helped, 5)}/5`, desc: helped >= 5 ? 'Ayudaste a 5 personas en la calle.' : `Ayudá a 5 personas que te pidan ayuda en la calle (llevás ${helped}).` });
+  list.push({ id: 'calle-heroe', group: 'Calle', icon: '🦸', name: 'Héroe de Santa Bruma', title: 'Mini retos de la calle', earned: distinct >= STREET_CHALLENGES.length, progress: `${distinct}/${STREET_CHALLENGES.length}`, desc: distinct >= STREET_CHALLENGES.length ? 'Resolviste todos los mini retos de la calle.' : `Resolvé los ${STREET_CHALLENGES.length} mini retos distintos de la calle (llevás ${distinct}).` });
   return list;
 }
 

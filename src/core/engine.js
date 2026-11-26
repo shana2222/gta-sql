@@ -3,7 +3,7 @@ import { RoadPathfinder } from '../world/pathfinding.js?v=2';
 import { TrafficManager } from '../world/traffic-manager.js?v=24';
 import { BoatManager } from '../world/boat-manager.js?v=17';
 import { InputManager } from '../input/input-manager.js?v=20';
-import { WebGLRenderer } from '../render/webgl-renderer.js?v=29';
+import { WebGLRenderer } from '../render/webgl-renderer.js?v=30';
 import { isInWater, resolveCircleStaticObstacle, resolveEntityCollisions, resolveVehiclePairCollision } from '../physics/collision.js?v=11';
 import {
   applyPedestrianDamage,
@@ -23,7 +23,7 @@ import {
   updateVehicle,
   updateVehicleCriticalState
 } from '../physics/vehicle-physics.js?v=18';
-import { Minimap } from '../ui/minimap.js?v=29';
+import { Minimap } from '../ui/minimap.js?v=30';
 import { Inventory } from './inventory.js?v=20';
 import { createSaveSnapshot, saveGameState } from './save-state.js?v=3';
 import { getPendingMissionAssetUrls, preloadMissionAssets } from '../story/story-loader.js';
@@ -91,6 +91,9 @@ export class Engine {
     this.waypointRoute = [];
     this.waypointTimer = 0;
     this.rideInProgress = false;
+    this.streetEvent = null;
+    this.streetTimer = 30 + Math.random() * 25;
+    if (typeof window !== 'undefined' && /[?&]debug=1\b/.test(window.location?.search || '')) window.__gtaEngine = this;
     this.objectiveCode = null;
     this.objectivePoint = null;
     this.objectiveNpcPoint = null;
@@ -886,6 +889,7 @@ export class Engine {
       waypoint: this.waypoint,
       waypointRoute: this.waypointRoute,
       sidePins: this.#sidePins().map((p) => ({ ...p, done: done(p.center) })),
+      streetEvent: this.streetEvent,
     };
   }
 
@@ -976,6 +980,77 @@ export class Engine {
       this.hud.showToast(`🚕 Llegaste a ${wp.name}. ¡Gracias por viajar en Ubyte!`);
       this.#persistSaveState();
     }, 1700);
+  }
+
+  /* ---------- Mini retos al azar en la calle ---------- */
+  #updateStreetEvent(dt) {
+    if (typeof window === 'undefined' || !window.gtaSql?.nextStreetChallenge || !this.cityMap) return;
+    if (this.cutscene?.active || this.player.isDead || this.deathSequence) return;
+    const ev = this.streetEvent;
+    if (ev) {
+      ev.ttl -= dt;
+      ev.bubbleT -= dt;
+      const dist = Math.hypot(this.player.x - ev.x, this.player.y - ev.y);
+      if (ev.bubbleT <= 0 && dist < 900) {
+        ev.bubbleT = 7;
+        this.hud.showNpcSpeechBubble(ev, ev.cry.slice(0, 60), this.#worldToScreen(ev.x, ev.y - 22));
+      }
+      if (!ev.hinted && dist < 110 && !this.player.inVehicleId) {
+        ev.hinted = true;
+        this.hud.showToast(`Apretá Espacio para ayudar a ${ev.who}.`);
+      }
+      if (ev.ttl <= 0) {
+        this.hud.showToast(`${ev.icon} ${ev.who} consiguió ayuda de otra persona.`);
+        this.streetEvent = null;
+        this.streetTimer = 40 + Math.random() * 40;
+      }
+      return;
+    }
+    this.streetTimer -= dt;
+    if (window.__gtaForceStreetEvent) { window.__gtaForceStreetEvent = false; this.streetTimer = 0; }
+    if (this.streetTimer > 0) return;
+    const spot = this.#pickSidewalkSpot();
+    if (!spot) { this.streetTimer = 10; return; }
+    const ch = window.gtaSql.nextStreetChallenge();
+    this.streetEvent = {
+      ...spot, angle: Math.random() * Math.PI * 2, streetEvent: true,
+      chId: ch.id, who: ch.who, icon: ch.icon, cry: ch.cry, ttl: 150, bubbleT: 0, hinted: false,
+    };
+    this.hud.showToast(`❗ ${ch.icon} ${ch.who} necesita ayuda cerca. Buscá el ❗ rojo en el minimapa.`);
+  }
+
+  #pickSidewalkSpot() {
+    const cands = [];
+    for (const row of this.cityMap.blocks) {
+      for (const b of row) {
+        if (b.isPlaza) continue;
+        const bb = b.bounds;
+        const spots = [
+          { x: bb.x + 13, y: bb.y + bb.h * 0.5 },
+          { x: bb.x + bb.w - 13, y: bb.y + bb.h * 0.5 },
+          { x: bb.x + bb.w * 0.5, y: bb.y + 13 },
+          { x: bb.x + bb.w * 0.5, y: bb.y + bb.h - 13 },
+        ];
+        for (const sp of spots) {
+          const d = Math.hypot(sp.x - this.player.x, sp.y - this.player.y);
+          if (d > 320 && d < 760) cands.push(sp);
+        }
+      }
+    }
+    return cands.length ? cands[Math.floor(Math.random() * cands.length)] : null;
+  }
+
+  #openStreetEvent() {
+    const ev = this.streetEvent;
+    if (!ev || !window.gtaSql?.openStreetChallenge) return;
+    window.gtaSql.openStreetChallenge(ev.chId, {
+      onClose: ({ solved }) => {
+        if (solved) {
+          this.streetEvent = null;
+          this.streetTimer = 60 + Math.random() * 45;
+        }
+      },
+    });
   }
 
   #findNearbyEncounterNpc() {
@@ -1561,6 +1636,12 @@ export class Engine {
         } else {
           this.player.walkPhase = 0;
         }
+        if (input.actionJustPressed && this.streetEvent && !this.player.insideLocationCode
+          && Math.hypot(this.player.x - this.streetEvent.x, this.player.y - this.streetEvent.y) < 80) {
+          this.player.speed = 0;
+          this.#openStreetEvent();
+          return;
+        }
         if (input.actionJustPressed && !this.#isNearInteriorStoryNpc()) {
           const encounterNpc = this.#findNearbyEncounterNpc();
           if (encounterNpc && this.cutscene) {
@@ -2116,6 +2197,8 @@ export class Engine {
       }
     }
 
+    this.#updateStreetEvent(dt);
+
     this.routeTimer += dt;
     if (this.objectiveCode && this.routeTimer >= 0.25) {
       this.routeTimer = 0;
@@ -2366,7 +2449,7 @@ export class Engine {
       worldCollectibles: this.worldCollectibles,
       objectivePoint: hideTargetNpc ? null : this.objectivePoint,
       objectiveNpcPoint: hideTargetNpc ? null : this.objectiveNpcPoint,
-      completedNpcPoints: [...this.completedNpcPoints, ...this.encounterNpcs],
+      completedNpcPoints: [...this.completedNpcPoints, ...this.encounterNpcs, ...(this.streetEvent ? [this.streetEvent] : [])],
       encounterLocations: this.#roofMarks(),
       emitNpcWaves: !hideTargetNpc && Boolean(this.objectiveNpcPoint || this.objectivePoint),
       time: this.elapsedTime
